@@ -35,4 +35,14 @@
 /xer_encoder.h
 /xer_support.c
 /xer_support.h
+/ENUMERATED.h
+/ENUMERATED.c
+/INTEGER.h
+/INTEGER.c
+/NativeEnumerated.h
+/NativeEnumerated.c
+/constr_SEQUENCE.h
+/constr_SEQUENCE.c
+/NativeInteger.h
+/NativeInteger.c
 # End compiler generated files
