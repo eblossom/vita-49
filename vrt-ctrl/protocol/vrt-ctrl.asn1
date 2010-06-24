@@ -23,16 +23,40 @@ AUTOMATIC TAGS ::=
 BEGIN
 
 
-Name-component ::= CHOICE {
-  str		PrintableString,
-  int		INTEGER
+-- VRT 64-bit 2's comp fixed point representation with radix point to the
+-- right of bit 20 in the second 32-bit word.  Breaking it into two words
+-- allows a compiler to avoid use of extended precision integers.
+
+Vrt-hertz ::= SEQUENCE { 
+  msw INTEGER, 					  -- most significant word
+  lsw INTEGER 					  -- least significant word
 }
 
-Name ::= SEQUENCE OF Name-component
+--
+-- 32-bit integer containing two 16-bit fixed point gains (VRT Figure 7.1.5.10-1)
+-- In each stage, there are 7 bits to the right of the radix point.
+--
+--  3                     2                   1
+--  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+-- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+-- |         Stage 2 Gain          |           Stage 1 Gain        |
+-- +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+--
 
+Vrt-gain ::= INTEGER
+
+Vrt-any ::= CHOICE {
+  seq	        SEQUENCE OF Vrt-any,
+  int		INTEGER,
+  str		IA5String,
+  octet-string	OCTET STRING
+  --hertz		Vrt-hertz,
+  --gain		Vrt-gain
+}
+
+Name ::= IA5String
+Value ::= Vrt-any
 Invocation-ID ::= INTEGER
-
-Value ::= INTEGER				  -- FIXME big choice
 
 Error-info ::= SEQUENCE {
   error-code	INTEGER,			  -- FIXME enum
@@ -79,11 +103,20 @@ Reject-op ::= SEQUENCE {
   error-info	Error-info
 }
 
+Notify-op ::= SEQUENCE {
+  kind		INTEGER,
+  arg		Value
+}
+
+--
+-- Top level message: Abstract Syntax
+--
 Operation ::= CHOICE {
   call		Call-op,	-- host -> radio
   reply		Reply-op,	-- radio -> host
   error		Error-op,	-- radio -> host
-  reject	Reject-op	-- radio -> host
+  reject	Reject-op,	-- radio -> host
+  notify	Notify-op	-- radio -> host
 }
 
 END
