@@ -1,0 +1,56 @@
+<integer> ::= INTEGER ;		// ASN.1 INTEGER
+	      	      		// Syntax: [0-9]+
+
+<bool>    ::= BOOLEAN ;         // ASN.1 BOOLEAN
+	      	      		// Syntax: #t #f
+
+<string>  ::= OCTET STRING ;    // ASN.1 OCTET STRING
+	      	    	   	// Syntax:  "blah, blah, blah"
+
+<basic-type> ::= <integer>
+               | <bool>
+               | <string>
+	       ;
+
+<expr> ::= <basic-type> 
+         | <sequence>
+	 ;
+
+
+<sequence> ::= { <expr>* }	// ASN.1 SEQUENCE OF <expr>
+	       	 	 	// Syntax: { <expr>* }
+				// (zero or more <expr>'s)
+
+<protocol-msg> ::= { <CALL> <invocation-id> <target-and-args> }
+                 | { <REPLY> <invocation-id> <reply> }
+                 | { <ERROR> <invocation-id> <error-info> }
+                 | { <REJECT> <error-info> }
+                 | { <NOTICE> <kind> <arg> } 
+		 ;
+
+<invocation-id> ::= <integer> ;
+
+<error-info> ::= { <error-code> <error-arg> } ;
+
+<error-code> ::= <integer> ;
+
+<error-arg> ::= <expr> ;
+
+<target-and-args> ::= { <GET>  <path> }
+                    | { <GET-META> <path> }
+                    | { <SET> <path> <value> }
+		    ;
+
+
+# Not quite right
+
+<path> := <path-component>
+        | <path-component> <path>
+
+<path-component> ::= '/' <path-term>
+
+<path-term> ::= '[a-z][a-z0-9_]*'		// regular expression
+              | '0x[0-9a-f]+'			// regular expression
+	      ;
+
+
