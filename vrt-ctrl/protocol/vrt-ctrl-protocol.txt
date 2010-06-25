@@ -1,3 +1,25 @@
+//
+// Copyright 2010 Free Software Foundation, Inc.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+//
+// <protocol-msg> is the top-level PDU.
+// It describes the messages exchanged on the wire.
+//
+
 <integer> ::= INTEGER ;		// ASN.1 INTEGER
 	      	      		// Syntax: [0-9]+
 
@@ -21,14 +43,19 @@
 	       	 	 	// Syntax: { <expr>* }
 				// (zero or more <expr>'s)
 
-<protocol-msg> ::= { <CALL> <invocation-id> <target-and-args> }
-                 | { <REPLY> <invocation-id> <reply> }
-                 | { <ERROR> <invocation-id> <error-info> }
-                 | { <REJECT> <error-info> }
-                 | { <NOTICE> <kind> <arg> } 
+<protocol-msg> ::= { <CALL> <invocation-id> <target-and-args> }	    // host -> radio
+                 | { <REPLY> <invocation-id> <expr> }	      	    // radio -> host
+                 | { <ERROR> <invocation-id> <error-info> }	    // radio -> host
+                 | { <REJECT> <error-info> } 		  	    // radio -> host
+                 | { <NOTICE> <kind> <arg> } 			    // radio -> host
 		 ;
 
 <invocation-id> ::= <integer> ;
+
+<target-and-args> ::= <GET>  <path>
+                    | <GET-META> <path>
+                    | <SET> <path> <expr>
+		    ;
 
 <error-info> ::= { <error-code> <error-arg> } ;
 
@@ -36,21 +63,39 @@
 
 <error-arg> ::= <expr> ;
 
-<target-and-args> ::= { <GET>  <path> }
-                    | { <GET-META> <path> }
-                    | { <SET> <path> <value> }
-		    ;
+
+<path> ::= '/'
+         | <pathx>
+	 ;
 
 
-# Not quite right
-
-<path> := <path-component>
-        | <path-component> <path>
+<pathx> := <path-component>
+         | <path-component> <pathx>
 
 <path-component> ::= '/' <path-term>
 
-<path-term> ::= '[a-z][a-z0-9_]*'		// regular expression
-              | '0x[0-9a-f]+'			// regular expression
+<path-term> ::= <alpha-path-term>
+	      | <numeric-path-term>
 	      ;
 
+<alpha-path-term>   ::= '[a-z][a-z-]*' ;	// regular expression
+<numeric-path-term> ::= '-?0x[0-9a-f]+'  ;	// regular expression
+
+
+// ----------------------------------------------------------------
+// Constants
+
+// protocol-msg constants
+
+<CALL>      ::= 0 ;
+<REPLY>	    ::= 1 ;
+<ERROR>	    ::= 2 ;
+<REJECT>    ::= 3 ;
+<NOTICE>    ::= 4 ;
+
+// target-and-args constants
+
+<GET>       ::= 0;
+<GET-META>  ::= 1;
+<SET>       ::= 2;
 
