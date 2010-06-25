@@ -20,54 +20,61 @@
 // It describes the messages exchanged on the wire.
 //
 
-<integer> ::= INTEGER ;		// ASN.1 INTEGER
-	      	      		// Syntax: [0-9]+
+
+<null>    ::= NULL;		// ASN.1 NULL
+	      			// Syntax: #null
 
 <bool>    ::= BOOLEAN ;         // ASN.1 BOOLEAN
 	      	      		// Syntax: #t #f
 
+<integer> ::= INTEGER ;		// ASN.1 INTEGER
+	      	      		// Syntax: [0-9]+
+
 <string>  ::= OCTET STRING ;    // ASN.1 OCTET STRING
 	      	    	   	// Syntax:  "blah, blah, blah"
 
-<basic-type> ::= <integer>
+<complex-int> ::= ComplexInt;   // ASN.1 ComplexInt
+
+<basic-type> ::= <null>
                | <bool>
+	       | <integer>
                | <string>
+	       | <complex-int>
 	       ;
 
-<expr> ::= <basic-type> 
+
+<expr> ::= <basic-type>		// ASN.1 Expr
          | <sequence>
 	 ;
 
 
-<sequence> ::= { <expr>* }	// ASN.1 SEQUENCE OF <expr>
+<sequence> ::= { <expr>* }	// ASN.1 SEQUENCE OF Expr
 	       	 	 	// Syntax: { <expr>* }
 				// (zero or more <expr>'s)
 
-<protocol-msg> ::= { <CALL> <invocation-id> <target-and-args> }	    // host -> radio
+
+<protocol-msg> ::= { <CALL> <invocation-id> <opcode-and-args> }	    // host -> radio
                  | { <REPLY> <invocation-id> <expr> }	      	    // radio -> host
                  | { <ERROR> <invocation-id> <error-info> }	    // radio -> host
                  | { <REJECT> <error-info> } 		  	    // radio -> host
-                 | { <NOTICE> <kind> <arg> } 			    // radio -> host
+                 | { <NOTE> <note-kind> <note-arg> }		    // radio -> host
 		 ;
 
 <invocation-id> ::= <integer> ;
 
-<target-and-args> ::= <GET>  <path>
-                    | <GET-META> <path>
-                    | <SET> <path> <expr>
+<opcode-and-args> ::= { <GET>  <path> }
+                    | { <GET-META> <path> }
+                    | { <SET> <path> <expr> }
 		    ;
 
 <error-info> ::= { <error-code> <error-arg> } ;
-
 <error-code> ::= <integer> ;
-
 <error-arg> ::= <expr> ;
 
 
 <path> ::= '/'
          | <pathx>
 	 ;
-
 
 <pathx> := <path-component>
          | <path-component> <pathx>
@@ -81,6 +88,8 @@
 <alpha-path-term>   ::= '[a-z][a-z-]*' ;	// regular expression
 <numeric-path-term> ::= '-?0x[0-9a-f]+'  ;	// regular expression
 
+<note-kind> ::= <integer> ;		 	// see constants below
+<note-arg>  ::= <expr> ;
 
 // ----------------------------------------------------------------
 // Constants
@@ -93,9 +102,17 @@
 <REJECT>    ::= 3 ;
 <NOTICE>    ::= 4 ;
 
-// target-and-args constants
+// opcode-and-args constants
 
-<GET>       ::= 0;
-<GET-META>  ::= 1;
-<SET>       ::= 2;
+<GET>       ::= 0 ;
+<GET-META>  ::= 1 ;
+<SET>       ::= 2 ;
 
+// note kind constants
+
+<DEBUG-OUTPUT>   ::= 0 ;  // <note-arg> is <string> to be output or logged
+<TX-UNDERRUN>    ::= 1 ;  // Transmitter ran out of samples in middle of burst; <note-arg> is <null>
+<RX-OVERRUN>     ::= 2 ;  // Receiver ran out of buffer space in middle of burst; <note-arg> is <null>
+<INTERNAL-ERROR> ::= 3 ;  // Device detected an internal problem; <note-arg> provides addl info
+
+<VENDOR-NOTE>	 ::= 1024 ; // [1024 to 2047] are reserved for vendor use
