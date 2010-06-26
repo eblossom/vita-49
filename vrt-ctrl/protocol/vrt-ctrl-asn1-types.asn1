@@ -1,0 +1,35 @@
+--  -*- asn1-mode -*-
+--
+-- This file is in the public domain
+--
+
+VRT-Control-Protocol { iso org(3) dod(6) internet(1) private(4) enterprise(1)
+		       gnu(11591) radio(7) protocol(0) vrt-ctrl(0) rev(0) }
+DEFINITIONS
+EXPLICIT TAGS ::=
+BEGIN
+
+Expr ::= CHOICE {
+  null		NULL,
+  bool		BOOLEAN,
+  integer	INTEGER,
+  string	OCTET STRING,
+  ieee-float	IEEE-float,
+  complex-float	Complex-float,
+  complex-int	Complex-int,
+  seq		SEQUENCE OF Expr
+}
+
+IEEE-float ::= [1] INTEGER			-- IEEE float punned to 32-bit int
+
+Complex-float ::= [2] SEQUENCE {
+  real		IEEE-float,
+  imag		IEEE-float
+}
+
+Complex-int ::= [3] SEQUENCE {
+  real		INTEGER,
+  imag		INTEGER
+}
+
+END
