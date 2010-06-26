@@ -2,7 +2,6 @@
 --
 -- This file is in the public domain
 --
---
 -- All ASN.1 objects shall be encoded using the Distinguished Encoding Rules (DER)
 --
 
@@ -11,6 +10,10 @@ VRT-Control-Protocol { iso org(3) dod(6) internet(1) private(4) enterprise(1)
 DEFINITIONS
 EXPLICIT TAGS ::=
 BEGIN
+
+-- Expr is the top-level abstract syntax.  The VRT control protocol is
+-- built on top of it.  See vrt-ctrl-protocol.txt for the specification
+-- of the protocol itself.
 
 -- Devices MAY implement the ieee-float and complex-float types if useful, 
 -- but are NOT REQUIRED to implement them.  All other types are REQUIRED

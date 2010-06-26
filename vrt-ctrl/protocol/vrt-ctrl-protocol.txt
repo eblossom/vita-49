@@ -23,11 +23,12 @@
 //
 // Everything is built on top of the ASN.1 type Expr, defined in
 // vrt-ctrl-asn1-types.asn1.  Expr represents a choice of null, bool,
-// integer, string, ieee-float, complex-float, complex-int types, and
-// sequence of Exprs.  This representation is easily mapped into
+// integer, string, complex-int, ieee-float, complex-float types, or
+// sequences of Exprs.  This representation is easily mapped into
 // Python, Erlang, and C.
 //
 // All ASN.1 objects are encoded using the Distinguished Encoding Rules (DER)
+
 
 // ------------------------------------------------------------------------
 // For clarity in describing the protocol, the following productions
@@ -72,6 +73,10 @@
 					// Syntax: { <expr>* }
 					// (zero or more <expr>'s)
 
+// ------------------------------------------------------------------------
+// All messages on the wire are derived from <protocol-msg>.
+// This is the top-level syntax.
+
 
 <protocol-msg> ::= { <CALL> <invocation-id> <opcode-and-args> }	    // host -> radio
                  | { <REPLY> <invocation-id> <expr> }	      	    // radio -> host
@@ -80,11 +85,30 @@
                  | { <NOTE> <note-kind> <note-arg> }		    // radio -> host
 		 ;
 
+// Allows host to match responses to <CALL>s
 <invocation-id> ::= <integer> ;
+
+
+// There are only 3 operations defined.
+// Everything is done in terms of these 3 operations.
+//
+// (This is more-or-less isomorphic to the Representational State Transfer (REST)
+// architecture used in the modern web, where there is a virtually unbounded
+// number of resources (device attributes) and a very small number of operations. 
+// See FIXME.)
+//
+// <GET> Retrieves the value associated with a hierarchical <path> (aka key or property name).
+// <PUT> Asks the device to associate <expr> as the value of <path>.
+// <GET-META> Retrieves all metadata associated with <path>.  E.g., valid ranges of values.
+//
+// With these three operations any device attribute may be queried or set.
+// <path> conventions are described in FIXME vrt-ctrl-path-conventions.txt
+//
+// See below for details. FIXME
 
 <opcode-and-args> ::= { <GET>  <path> }
                     | { <GET-META> <path> }
-                    | { <SET> <path> <expr> }
+                    | { <PUT> <path> <expr> }
 		    ;
 
 <error-info> ::= { <error-code> <error-arg> } ;
@@ -126,7 +150,7 @@
 
 <GET>       ::= 0 ;
 <GET-META>  ::= 1 ;
-<SET>       ::= 2 ;
+<PUT>       ::= 2 ;
 
 // note kind constants
 
