@@ -2,6 +2,9 @@
 --
 -- This file is in the public domain
 --
+--
+-- All ASN.1 objects shall be encoded using the Distinguished Encoding Rules (DER)
+--
 
 VRT-Control-Protocol { iso org(3) dod(6) internet(1) private(4) enterprise(1)
 		       gnu(11591) radio(7) protocol(0) vrt-ctrl(0) rev(0) }
@@ -9,27 +12,31 @@ DEFINITIONS
 EXPLICIT TAGS ::=
 BEGIN
 
+-- Devices MAY implement the ieee-float and complex-float types if useful, 
+-- but are NOT REQUIRED to implement them.  All other types are REQUIRED
+-- to be implemented by both host and device code.
+
 Expr ::= CHOICE {
+  seq		SEQUENCE OF Expr,
   null		NULL,
   bool		BOOLEAN,
   integer	INTEGER,
   string	OCTET STRING,
-  ieee-float	IEEE-float,
-  complex-float	Complex-float,
   complex-int	Complex-int,
-  seq		SEQUENCE OF Expr
+  ieee-float	IEEE-float,
+  complex-float	Complex-float
 }
 
-IEEE-float ::= [1] INTEGER			-- IEEE float punned to 32-bit int
-
-Complex-float ::= [2] SEQUENCE {
-  real		IEEE-float,
-  imag		IEEE-float
-}
-
-Complex-int ::= [3] SEQUENCE {
+Complex-int ::= [1] SEQUENCE {
   real		INTEGER,
   imag		INTEGER
+}
+
+IEEE-float ::= [2] INTEGER	    -- IEEE float punned to 32-bit int
+
+Complex-float ::= [3] SEQUENCE {
+  real		IEEE-float,
+  imag		IEEE-float
 }
 
 END

@@ -20,37 +20,57 @@
 // It describes the messages exchanged on the wire.
 //
 
+//
+// Everything is built on top of the ASN.1 type Expr, defined in
+// vrt-ctrl-asn1-types.asn1.  Expr represents a choice of null, bool,
+// integer, string, ieee-float, complex-float, complex-int types, and
+// sequence of Exprs.  This representation is easily mapped into
+// Python, Erlang, and C.
+//
+// All ASN.1 objects are encoded using the Distinguished Encoding Rules (DER)
 
-<null>    ::= NULL;		// ASN.1 NULL
-	      			// Syntax: #null
+// ------------------------------------------------------------------------
+// For clarity in describing the protocol, the following productions
+// represent instances of the underlying ASN.1 types.
+// ------------------------------------------------------------------------
 
-<bool>    ::= BOOLEAN ;         // ASN.1 BOOLEAN
-	      	      		// Syntax: #t #f
+<null>    ::= NULL;			// ASN.1 NULL
+	      			     	// Syntax: #null
 
-<integer> ::= INTEGER ;		// ASN.1 INTEGER
-	      	      		// Syntax: [0-9]+
+<bool>    ::= BOOLEAN ;              	// ASN.1 BOOLEAN
+	      	      		     	// Syntax: #t #f
 
-<string>  ::= OCTET STRING ;    // ASN.1 OCTET STRING
-	      	    	   	// Syntax:  "blah, blah, blah"
+<integer> ::= INTEGER ;		     	// ASN.1 INTEGER
+	      	      		     	// Syntax: [0-9]+
 
-<complex-int> ::= ComplexInt;   // ASN.1 ComplexInt
+<string>  ::= OCTET STRING ;         	// ASN.1 OCTET STRING
+	      	    	   	     	// Syntax:  "blah, blah, blah"
+
+<ieee-float> ::= IEEE-Float ;		// ASN.1 IEEE-Float
+
+<complex-float> ::= Complex-float ; 	// ASN.1 Complex-float
+
+<complex-int> ::= Complex-int;	    	// ASN.1 Complex-int
+
 
 <basic-type> ::= <null>
                | <bool>
 	       | <integer>
                | <string>
+	       | <float>
+	       | <complex-float>
 	       | <complex-int>
 	       ;
 
 
-<expr> ::= <basic-type>		// ASN.1 Expr
+<expr> ::= <basic-type>			// ASN.1 Expr
          | <sequence>
 	 ;
 
 
-<sequence> ::= { <expr>* }	// ASN.1 SEQUENCE OF Expr
-	       	 	 	// Syntax: { <expr>* }
-				// (zero or more <expr>'s)
+<sequence> ::= { <expr>* }		// Sequence of Expr
+					// Syntax: { <expr>* }
+					// (zero or more <expr>'s)
 
 
 <protocol-msg> ::= { <CALL> <invocation-id> <opcode-and-args> }	    // host -> radio
