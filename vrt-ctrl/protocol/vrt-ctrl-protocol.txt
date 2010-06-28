@@ -116,6 +116,7 @@
 <error-arg> ::= <expr> ;
 
 
+// Starts with a '/' and contains zero or more '/' separated <path-terms>
 <path> ::= '/'
          | <pathx>
 	 ;
@@ -131,6 +132,7 @@
 
 <alpha-path-term>   ::= '[a-z][a-z-]*' ;	// regular expression
 <numeric-path-term> ::= '-?0x[0-9a-f]+'  ;	// regular expression
+
 
 <note-kind> ::= <integer> ;		 	// see constants below
 <note-arg>  ::= <expr> ;
@@ -160,3 +162,9 @@
 <INTERNAL-ERROR> ::= 3 ;  // Device detected an internal problem; <note-arg> provides addl info
 
 <VENDOR-NOTE>	 ::= 1024 ; // [1024 to 2047] are reserved for vendor use
+
+
+// ----------------------------------------------------------------
+// Message sequences
+
+
