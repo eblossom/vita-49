@@ -35,55 +35,55 @@
 // represent instances of the underlying ASN.1 types.
 // ------------------------------------------------------------------------
 
-<null>    ::= NULL;			// ASN.1 NULL
-	      			     	// Syntax: #null
+<null>    ::= NULL;                     // ASN.1 NULL
+                                        // Syntax: #null
 
-<bool>    ::= BOOLEAN ;              	// ASN.1 BOOLEAN
-	      	      		     	// Syntax: #t #f
+<bool>    ::= BOOLEAN ;                 // ASN.1 BOOLEAN
+                                        // Syntax: #t #f
 
-<integer> ::= INTEGER ;		     	// ASN.1 INTEGER
-	      	      		     	// Syntax: [0-9]+
+<integer> ::= INTEGER ;                 // ASN.1 INTEGER
+                                        // Syntax: [0-9]+
 
-<string>  ::= OCTET STRING ;         	// ASN.1 OCTET STRING
-	      	    	   	     	// Syntax:  "blah, blah, blah"
+<string>  ::= OCTET STRING ;            // ASN.1 OCTET STRING
+                                        // Syntax:  "blah, blah, blah"
 
-<ieee-float> ::= IEEE-Float ;		// ASN.1 IEEE-Float
+<ieee-float> ::= IEEE-Float ;           // ASN.1 IEEE-Float
 
-<complex-float> ::= Complex-float ; 	// ASN.1 Complex-float
+<complex-float> ::= Complex-float ;     // ASN.1 Complex-float
 
-<complex-int> ::= Complex-int;	    	// ASN.1 Complex-int
+<complex-int> ::= Complex-int;          // ASN.1 Complex-int
 
 
 <basic-type> ::= <null>
                | <bool>
-	       | <integer>
+               | <integer>
                | <string>
-	       | <float>
-	       | <complex-float>
-	       | <complex-int>
-	       ;
+               | <float>
+               | <complex-float>
+               | <complex-int>
+               ;
 
 
-<expr> ::= <basic-type>			// ASN.1 Expr
+<expr> ::= <basic-type>                 // ASN.1 Expr
          | <sequence>
-	 ;
+         ;
 
 
-<sequence> ::= { <expr>* }		// Sequence of Expr
-					// Syntax: { <expr>* }
-					// (zero or more <expr>'s)
+<sequence> ::= { <expr>* }              // Sequence of Expr
+                                        // Syntax: { <expr>* }
+                                        // (zero or more <expr>'s)
 
 // ------------------------------------------------------------------------
 // All messages on the wire are derived from <protocol-msg>.
 // This is the top-level syntax.
 
 
-<protocol-msg> ::= { <CALL> <invocation-id> <opcode-and-args> }	    // host -> radio
-                 | { <REPLY> <invocation-id> <expr> }	      	    // radio -> host
-                 | { <ERROR> <invocation-id> <error-info> }	    // radio -> host
-                 | { <REJECT> <error-info> } 		  	    // radio -> host
-                 | { <NOTE> <note-kind> <note-arg> }		    // radio -> host
-		 ;
+<protocol-msg> ::= { <CALL> <invocation-id> <opcode-and-args> }     // host -> radio
+                 | { <REPLY> <invocation-id> <expr> }               // radio -> host
+                 | { <ERROR> <invocation-id> <error-info> }         // radio -> host
+                 | { <REJECT> <error-info> }                        // radio -> host
+                 | { <NOTE> <note-kind> <note-arg> }                // radio -> host
+                 ;
 
 // Allows host to match responses to <CALL>s
 <invocation-id> ::= <integer> ;
@@ -102,14 +102,14 @@
 // <GET-META> Retrieves all metadata associated with <path>.  E.g., valid ranges of values.
 //
 // With these three operations any device attribute may be queried or set.
-// <path> conventions are described in FIXME vrt-ctrl-path-conventions.txt
+// <path> requirements are described in FIXME vrt-ctrl-path-requirements.txt
 //
 // See below for details. FIXME
 
 <opcode-and-args> ::= { <GET>  <path> }
                     | { <GET-META> <path> }
                     | { <PUT> <path> <expr> }
-		    ;
+                    ;
 
 <error-info> ::= { <error-code> <error-arg> } ;
 <error-code> ::= <integer> ;
@@ -119,7 +119,7 @@
 // Starts with a '/' and contains zero or more '/' separated <path-terms>
 <path> ::= '/'
          | <pathx>
-	 ;
+         ;
 
 <pathx> := <path-component>
          | <path-component> <pathx>
@@ -127,15 +127,31 @@
 <path-component> ::= '/' <path-term>
 
 <path-term> ::= <alpha-path-term>
-	      | <numeric-path-term>
-	      ;
+              | <numeric-path-term>
+              ;
 
-<alpha-path-term>   ::= '[a-z][a-z-]*' ;	// regular expression
-<numeric-path-term> ::= '-?0x[0-9a-f]+'  ;	// regular expression
+// regular expression
+<alpha-path-term>   ::= '[a-z][a-z-]*' ;
 
+// numeric-path-terms MUST be encoded with the minimum number of
+// leading zeros.  E.g. zero -> 0x0, one -> 0x1, NOT one -> 0x01.
+// (This gives an unambiguous mapping between an integer value and a
+// corresponding <numeric-path-term>.)
+// regular expression:
+<numeric-path-term> ::= '-?0x[0-9a-f]+'  ;      
 
-<note-kind> ::= <integer> ;		 	// see constants below
+<note-kind> ::= <integer> ;                     // see constants below
 <note-arg>  ::= <expr> ;
+
+
+<sequence-of-path-terms> ::= { <path-term>* } ; // seq of zero or more <path-term>
+
+<metadata> ::= { <metadata-name> <metadata-value> } ;
+<metadata-name> := <path-term> ;
+<metadata-value> := <expr> ;
+
+<sequence-of-metadata> ::= { <metadata>* } ;    // seq of zero or more <metadata>
+
 
 // ----------------------------------------------------------------
 // Constants
@@ -143,10 +159,10 @@
 // protocol-msg constants
 
 <CALL>      ::= 0 ;
-<REPLY>	    ::= 1 ;
-<ERROR>	    ::= 2 ;
+<REPLY>     ::= 1 ;
+<ERROR>     ::= 2 ;
 <REJECT>    ::= 3 ;
-<NOTICE>    ::= 4 ;
+<NOTE>      ::= 4 ;
 
 // opcode-and-args constants
 
@@ -161,10 +177,113 @@
 <RX-OVERRUN>     ::= 2 ;  // Receiver ran out of buffer space in middle of burst; <note-arg> is <null>
 <INTERNAL-ERROR> ::= 3 ;  // Device detected an internal problem; <note-arg> provides addl info
 
-<VENDOR-NOTE>	 ::= 1024 ; // [1024 to 2047] are reserved for vendor use
+<VENDOR-NOTE>    ::= 1024 ; // [1024 to 2047] are reserved for vendor use
+
+
+// ----------------------------------------------------------------
+// Message encapsulation
+
+These rules allow for simplified encoding and decoding of ASN.1 DER in
+resource constrained environments.
+
+When using a datagram transport (i.e., UDP), there MUST be an
+integral number of DER encoded <protocol-msg>s contained in the datagram.
+
+When using a streaming transport (i.e., TCP), <protocol-msg>s MUST be
+"bundled" (zero or more per bundle), where a bundled consists of a
+network-endian 32-bit 2's complement integer that specifies the LENGTH
+of the bundle payload in bytes, followed by LENGTH bytes of DER encoded
+<protocol-msg>s.  Thus the smallest bundle is 4-bytes, consisting of
+a 4-byte integer containing the value 0, indicating that the payload
+contains no bytes.
 
 
 // ----------------------------------------------------------------
 // Message sequences
 
+At the highest level, <protocol-msg>s are exchanged between the host
+and device.  The host sends a <CALL> and expects to receive a <REPLY>,
+<ERROR> or <REJECT> response.  <REPLY> delivers the normal response to
+a <CALL>.  <ERROR> is returned if a problem is detected and the
+request was well formed.  <REJECT> is returned if the <protocol-msg> was
+ill-formed.  <REPLY> and <ERROR> carry the <invocation-id> from the
+corresponding <CALL>.  <REJECT> is sent in cases where the
+<protocol-msg> doesn't match the expected format, and thus no
+<invocation-id> can be reliably extracted.
+
+<CALL>s may be pipelined.  The host need not wait for a reply before
+sending another <CALL>.  Devices should attempt to enqueue received
+<CALL>s, but may reply with an <ERROR> with <error-code> == EC_CALL_QUEUE_FULL
+if the <CALL> can't be enqueued.
+
+// ----------------------------------------------------------------
+// Details of message sequences
+
+Notation:
+
+Host            Device
+------          ------
+
+{ host-send-this } ==>
+
+                { device-sends-this }
+              | { or-this }
+              |  ...
+
+// <GET> retrieves the value of the resource identified by <path>.
+//
+// <GET> applied to a directory resource (non-leaf) returns a sequence of
+// <path-terms> corresponding to the directory's immediate children.  This
+// allows all resources to be recursively discovered starting from "/".
+//
+// <GET> applied to a leaf resource returns the <expr> associated with
+// that resource.
+//
+// <ERROR> is returned if the <path> doesn't exist, isn't gettable, etc.
+
+{ <CALL> <invocation-id> { <GET> <path> } } ==>
+
+                { <REPLY> <invocation-id> { <DIR> <sequence-of-path-terms> }}
+              | { <REPLY> <invocation-id> { <LEAF> <expr> }}
+              | { <ERROR> <invocation-id> <error-info> }
+
+
+// <GET-METADATA> retrieves the metadata associated with the resource
+// identified by <path>.
+//
+// <GET-METADATA> applied to a directory resource (non-leaf) returns a
+// sequence of <path-terms> corresponding to the directory's immediate
+// children.  This allows all resources to be recursively discovered
+// starting from "/".  (<GET> and <GET-METADATA> behave identically
+// when applied to a directory resource.)
+//
+// <GET-METADATA> applied to a leaf resource returns all the metadata
+// associated with that resource.  <metadata> typically includes
+// information describing the acceptable type and ranges of values,
+// whether the resources is gettable, settable, both or neither, etc.
+// See FIXME vrt-ctrl-metadata-requirements.txt.
+//
+// <ERROR> is returned if the <path> doesn't exist, isn't gettable, etc.
+
+{ <CALL> <invocation-id> { <GET-META> <path> } } ==>
+
+                { <REPLY> <invocation-id> { <DIR> <sequence-of-path-terms> }}
+              | { <REPLY> <invocation-id> { <LEAF> <sequence-of-metadata> }}
+              | { <ERROR> <invocation-id> <error-info> }
+
+
+// <PUT> replaces the value associated with the resource identified by <path>.
+//
+// <PUT> applied to a directory resource (non-leaf) returns <ERROR>
+// with <error-code> == EC_CANT_PUT_DIRECTORY
+//
+// <PUT> applied to a leaf resource sets <expr> as the value of that resource.
+//
+// <ERROR> is returned if the <path> doesn't exist, is a directory,
+// isn't puttable, <expr> is of the wrong type, etc.
+
+{ <CALL> <invocation-id> { <PUT> <path> <expr>} } ==>
+
+                { <REPLY> <invocation-id> #t }
+              | { <ERROR> <invocation-id> <error-info> }
 
