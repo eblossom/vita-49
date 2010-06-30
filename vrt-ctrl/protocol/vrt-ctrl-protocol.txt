@@ -97,14 +97,14 @@
 // number of resources (device attributes) and a very small number of operations. 
 // See FIXME.)
 //
-// <GET> Retrieves the value associated with a hierarchical <path> (aka key or property name).
+// <GET> Retrieves the value of the resource identified by <path> (aka key or property name).
 // <PUT> Asks the device to associate <expr> as the value of <path>.
 // <GET-META> Retrieves all metadata associated with <path>.  E.g., valid ranges of values.
 //
 // With these three operations any device attribute may be queried or set.
 // <path> requirements are described in FIXME vrt-ctrl-path-requirements.txt
 //
-// See below for details. FIXME
+// See below for details.
 
 <opcode-and-args> ::= { <GET>  <path> }
                     | { <GET-META> <path> }
@@ -116,15 +116,15 @@
 <error-arg> ::= <expr> ;
 
 
-// Starts with a '/' and contains zero or more '/' separated <path-terms>
-<path> ::= '/'
+// Starts with a "/" and contains zero or more "/" separated <path-terms>
+<path> ::= "/"
          | <pathx>
          ;
 
 <pathx> := <path-component>
          | <path-component> <pathx>
 
-<path-component> ::= '/' <path-term>
+<path-component> ::= "/" <path-term>
 
 <path-term> ::= <alpha-path-term>
               | <numeric-path-term>
@@ -190,7 +190,7 @@ When using a datagram transport (i.e., UDP), there MUST be an
 integral number of DER encoded <protocol-msg>s contained in the datagram.
 
 When using a streaming transport (i.e., TCP), <protocol-msg>s MUST be
-"bundled" (zero or more per bundle), where a bundled consists of a
+"bundled" (zero or more per bundle), where a bundle consists of a
 network-endian 32-bit 2's complement integer that specifies the LENGTH
 of the bundle payload in bytes, followed by LENGTH bytes of DER encoded
 <protocol-msg>s.  Thus the smallest bundle is 4-bytes, consisting of
