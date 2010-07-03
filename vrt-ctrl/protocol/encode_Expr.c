@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <stdbool.h>
 #include "Expr.h"
+#include "vrt-ctrl-protocol-consts.h"
 
 void
 die(const char *msg)
@@ -78,11 +79,50 @@ vrtc_make_cstring(const char *p)
   return vrtc_make_string(p, len);
 }
 
+Expr_t *
+vrtc_make_seq(void)
+{
+  Expr_t *expr = safe_calloc(1, sizeof(Expr_t));
+  expr->present = Expr_PR_seq;
+  return expr;
+}
+
+bool
+vrtc_seq_add(Expr_t *seq, Expr_t *element)
+{
+  int ret = ASN_SEQUENCE_ADD(&seq->choice.seq, element);
+  return ret == 0;
+}
+
 void
 vrtc_free_expr(Expr_t *p)
 {
   ASN_STRUCT_FREE(asn_DEF_Expr, p);
 }
+
+
+// ------------------------------------------------------------------------
+
+Expr_t *
+vrtc_make_call(int invocation_id, Expr_t *opcode_and_args)
+{
+  Expr_t *call = vrtc_make_seq();
+  vrtc_seq_add(call, vrtc_make_int(vrtc_CALL));
+  vrtc_seq_add(call, vrtc_make_int(invocation_id));
+  vrtc_seq_add(call, opcode_and_args);
+  return call;
+}
+
+Expr_t *
+vrtc_make_get(int invocation_id, const char *path)
+{
+  Expr_t *op_and_args = vrtc_make_seq();
+  vrtc_seq_add(op_and_args, vrtc_make_int(vrtc_GET));
+  vrtc_seq_add(op_and_args, vrtc_make_cstring(path));
+  return vrtc_make_call(invocation_id, op_and_args);
+}
+
+// ------------------------------------------------------------------------
 
 void 
 handle_Expr(Expr_t *e, FILE *fp)
@@ -102,9 +142,7 @@ handle_Expr(Expr_t *e, FILE *fp)
 int
 main(int ac, char **av)
 {
-  Expr_t		*expr;
   FILE *fp = 0;
-
 
   if (ac < 2){
     fprintf(stderr, "Specify filename for BER output\n");
@@ -118,6 +156,8 @@ main(int ac, char **av)
     }
   }
     
+  Expr_t *expr;
+
   expr = vrtc_make_null();
   handle_Expr(expr, fp);
   vrtc_free_expr(expr);
@@ -134,7 +174,9 @@ main(int ac, char **av)
   handle_Expr(expr, fp);
   vrtc_free_expr(expr);
 
-  
+  expr = vrtc_make_get(1024, "/unit/0x7/freq");
+  handle_Expr(expr, fp);
+  vrtc_free_expr(expr);
 
 
   return 0;
