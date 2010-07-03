@@ -22,7 +22,7 @@ BEGIN
 Expr ::= CHOICE {
   seq		SEQUENCE OF Expr,
   null		NULL,
-  bool		BOOLEAN,
+  boolean	BOOLEAN,
   integer	INTEGER,
   string	OCTET STRING,
   complex-int	Complex-int,
