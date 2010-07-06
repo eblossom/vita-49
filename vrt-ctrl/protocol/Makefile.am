@@ -18,8 +18,7 @@
 include $(top_srcdir)/Makefile.common
 
 EXTRA_DIST = \
-	bootstrap \
-	configure \
-	config.h.in
+	README \
+	vrt-ctrl-asn1-types.asn1 \
+	vrt-ctrl-protocol.txt
 
-SUBDIRS = m4 protocol lib-asn1c lib

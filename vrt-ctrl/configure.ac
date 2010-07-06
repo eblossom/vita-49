@@ -82,23 +82,27 @@ fi
 AC_SUBST(autoconf_default_CXXFLAGS)
 AC_SUBST(swig_CXXFLAGS)
 
-dnl add ${prefix}/lib${gr_libdir_suffix}/pkgconfig to the head of the PKG_CONFIG_PATH
-if test x${PKG_CONFIG_PATH} = x; then
-    PKG_CONFIG_PATH=${prefix}/lib${gr_libdir_suffix}/pkgconfig
-else
-    PKG_CONFIG_PATH=${prefix}/lib${gr_libdir_suffix}/pkgconfig:${PKG_CONFIG_PATH}
-fi
-export PKG_CONFIG_PATH
 
 LF_SET_WARNINGS
 AM_PROG_AS
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
+AC_PROG_MKDIR_P
+AC_PATH_PROG([RM_PROG], [rm])
+
+AC_LIBTOOL_WIN32_DLL
+m4_ifdef([LT_INIT],[LT_INIT],[AC_PROG_LIBTOOL])
+
+GR_NO_UNDEFINED		dnl do we need the -no-undefined linker flag
+
 
 AC_CONFIG_FILES([\
     Makefile \
+    m4/Makefile \
+    lib/Makefile \
+    lib-asn1c/Makefile \
+    protocol/Makefile \
 ])
 
 AC_OUTPUT
-
