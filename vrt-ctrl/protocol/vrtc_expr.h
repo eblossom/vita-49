@@ -62,25 +62,25 @@ Expr_t *vrtc_make_seq0(void);
 
 /*! 
  * \brief Returns a sequence with 1 element \p x0 if successful, else 0.
- * If any args are non-zero, free all non-zero args and return 0.
+ * If any args are zero, free all non-zero args and return 0.
  */
 Expr_t *vrtc_make_seq1(Expr_t *x0);
 
 /*! 
  * \brief Returns a sequence with 2 elements \p x0, \p x1 if successful, else 0.
- * If any args are non-zero, free all non-zero args and return 0.
+ * If any args are zero, free all non-zero args and return 0.
  */
 Expr_t *vrtc_make_seq2(Expr_t *x0, Expr_t *x1);
 
 /*! 
  * \brief Returns a sequence with 3 elements \p x0, \p x1, \p x2 if successful, else 0.
- * If any args are non-zero, free all non-zero args and return 0.
+ * If any args are zero, free all non-zero args and return 0.
  */
 Expr_t *vrtc_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2);
 
 /*! 
  * \brief Returns a sequence with 4 elements \p x0, \p x1,\p x2, \p x3 if successful, else 0.
- * If any args are non-zero, free all non-zero args and return 0.
+ * If any args are zero, free all non-zero args and return 0.
  */
 Expr_t *vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3);
 
