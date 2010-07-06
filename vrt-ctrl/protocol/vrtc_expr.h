@@ -85,6 +85,13 @@ Expr_t *vrtc_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2);
 Expr_t *vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3);
 
 
+/* ------------------------------------------------------------------------ */
+
+Expr_t *vrtc_make_get(int invocation_id, const char *path);
+Expr_t *vrtc_make_get_meta(int invocation_id, const char *path);
+Expr_t *vrtc_make_put(int invocation_id, const char *path, Expr_t *v);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -181,7 +181,7 @@ vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
 // ------------------------------------------------------------------------
 
 static Expr_t *
-vrtc_make_call(int invocation_id, Expr_t *opcode_and_args)
+_vrtc_make_call(int invocation_id, Expr_t *opcode_and_args)
 {
   return vrtc_make_seq3(vrtc_make_int(vrtc_CALL),
 			vrtc_make_int(invocation_id),
@@ -191,9 +191,9 @@ vrtc_make_call(int invocation_id, Expr_t *opcode_and_args)
 static Expr_t *
 _vrtc_make_get_helper(int invocation_id, const char *path, int opcode)
 {
-  return vrtc_make_call(invocation_id, 
-			vrtc_make_seq2(vrtc_make_int(opcode),
-				       vrtc_make_cstring(path)));
+  return _vrtc_make_call(invocation_id, 
+			 vrtc_make_seq2(vrtc_make_int(opcode),
+					vrtc_make_cstring(path)));
 }
 
 Expr_t *
@@ -211,9 +211,9 @@ vrtc_make_get_meta(int invocation_id, const char *path)
 Expr_t *
 vrtc_make_put(int invocation_id, const char *path, Expr_t *v)
 {
-  return vrtc_make_call(invocation_id, 
-			vrtc_make_seq3(vrtc_make_int(vrtc_PUT),
-				       vrtc_make_cstring(path),
-				       v));
+  return _vrtc_make_call(invocation_id, 
+			 vrtc_make_seq3(vrtc_make_int(vrtc_PUT),
+					vrtc_make_cstring(path),
+					v));
 }
 

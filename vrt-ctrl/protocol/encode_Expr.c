@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <assert.h>
 
 void
 die(const char *msg)
@@ -57,22 +58,27 @@ main(int ac, char **av)
   Expr_t *expr;
 
   expr = vrtc_make_null();
+  assert(expr);
   handle_Expr(expr, fp);
   vrtc_free_expr(expr);
 
   expr = vrtc_make_int(1);
+  assert(expr);
   handle_Expr(expr, fp);
   vrtc_free_expr(expr);
 
   expr = vrtc_make_int(-1);
+  assert(expr);
   handle_Expr(expr, fp);
   vrtc_free_expr(expr);
 
   expr = vrtc_make_cstring("Hello VRT");
+  assert(expr);
   handle_Expr(expr, fp);
   vrtc_free_expr(expr);
 
   expr = vrtc_make_get(1024, "/unit/0x7/freq");
+  assert(expr);
   handle_Expr(expr, fp);
   vrtc_free_expr(expr);
 
