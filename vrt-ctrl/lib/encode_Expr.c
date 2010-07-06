@@ -35,7 +35,7 @@ handle_Expr(Expr_t *e, FILE *fp)
       exit(1);
     }
   }
-  xer_fprint(stdout, &asn_DEF_Expr, e);
+  // xer_fprint(stdout, &asn_DEF_Expr, e);
 }
 
 int

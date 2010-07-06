@@ -54,8 +54,8 @@ vrtc_make_string(const char *p, size_t len)
     return 0;
   expr->present = Expr_PR_string;
   if (OCTET_STRING_fromBuf(&expr->choice.string, p, len) == -1){
-    free(expr);
-    die("OCTET_STRING_fromBuf");
+    vrtc_free_expr(expr);
+    return 0;
   }
   return expr;
 }

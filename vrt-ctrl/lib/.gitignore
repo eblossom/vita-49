@@ -1,2 +1,5 @@
 /Makefile
 /Makefile.in
+/*.map
+/*.ber
+/encode_Expr
