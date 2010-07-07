@@ -85,12 +85,40 @@ Expr_t *vrtc_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2);
 Expr_t *vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3);
 
 
-/* ------------------------------------------------------------------------ */
+/*
+ * -------------------------------------------------------------------------
+ * Routines to encode and decode between Expr_t's and the on-the-wire format
+ * -------------------------------------------------------------------------
+ */
 
+typedef asn_enc_rval_t	vrtc_enc_rval_t;
+typedef asn_dec_rval_t  vrtc_dec_rval_t;
+typedef asn_app_consume_bytes_f vrtc_app_consume_bytes_t;
+
+vrtc_enc_rval_t
+vrtc_encode(Expr_t *e,
+	    vrtc_app_consume_bytes_t *consume_bytes_cb,
+	    void *cb_arg);
+
+vrtc_dec_rval_t
+vrtc_decode(Expr_t **e,		/* [output] decoded Expr_t */
+	    const void *buffer,	/* [input] data to be decoded */
+	    size_t size);		/* [input] # of bytes in buffer */
+
+/*
+ * ------------------------------------------------------------------------
+ * Routines used only by host code
+ * ------------------------------------------------------------------------
+ */
 Expr_t *vrtc_make_get(int invocation_id, const char *path);
 Expr_t *vrtc_make_get_meta(int invocation_id, const char *path);
 Expr_t *vrtc_make_put(int invocation_id, const char *path, Expr_t *v);
 
+/*
+ * ------------------------------------------------------------------------
+ * Routines used only by device code
+ * ------------------------------------------------------------------------
+ */
 
 #ifdef __cplusplus
 }

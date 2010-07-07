@@ -180,3 +180,24 @@ vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
   return 0;
 }
 
+
+vrtc_enc_rval_t
+vrtc_encode(Expr_t *e,
+	    vrtc_app_consume_bytes_t *consume_bytes_cb,
+	    void *cb_arg)
+{
+  vrtc_enc_rval_t rval;
+  rval = der_encode(&asn_DEF_Expr, e, consume_bytes_cb, cb_arg);
+  return rval;
+}
+
+
+vrtc_dec_rval_t
+vrtc_decode(Expr_t **e,
+	    const void *buffer,
+	    size_t size)
+{
+  vrtc_dec_rval_t rval;
+  rval = ber_decode(0, &asn_DEF_Expr, (void **)e, buffer, size);
+  return rval;
+}

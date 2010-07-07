@@ -27,8 +27,8 @@ void
 handle_Expr(Expr_t *e, FILE *fp)
 {
   if (fp){
-    asn_enc_rval_t	ec;
-    ec = der_encode(&asn_DEF_Expr, e, write_out, fp);
+    vrtc_enc_rval_t	ec;
+    ec = vrtc_encode(e, write_out, fp);
     if (ec.encoded == -1){
       fprintf(stderr, "Count not encode Expr (at %s)\n",
 	      ec.failed_type ? ec.failed_type->name : "unknown");
