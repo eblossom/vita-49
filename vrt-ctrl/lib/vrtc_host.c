@@ -1,4 +1,4 @@
-/* -*- c++ -*- */
+/* -*- c -*- */
 /*
  * Copyright 2010 Free Software Foundation, Inc.
  *
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "vrtc_expr.h"
+#include "vrtc_host.h"
 #include "vrt-ctrl-protocol-consts.h"
 
 /* Routines used only by host code */

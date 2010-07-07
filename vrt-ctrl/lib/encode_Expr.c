@@ -1,4 +1,5 @@
 #include <vrtc_expr.h>
+#include <vrtc_host.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>

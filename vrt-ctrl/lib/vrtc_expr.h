@@ -119,21 +119,6 @@ vrtc_decode(Expr_t **e,
 	    const void *buffer,
 	    size_t size);
 
-/*
- * ------------------------------------------------------------------------
- * Routines used only by host code
- * ------------------------------------------------------------------------
- */
-Expr_t *vrtc_make_get(int invocation_id, const char *path);
-Expr_t *vrtc_make_get_meta(int invocation_id, const char *path);
-Expr_t *vrtc_make_put(int invocation_id, const char *path, Expr_t *v);
-
-/*
- * ------------------------------------------------------------------------
- * Routines used only by device code
- * ------------------------------------------------------------------------
- */
-
 #ifdef __cplusplus
 }
 #endif

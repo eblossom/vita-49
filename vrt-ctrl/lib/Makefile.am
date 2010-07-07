@@ -25,10 +25,11 @@ lib_LTLIBRARIES = libvrtc.la
 
 libvrtc_la_SOURCES = \
 	vrtc_expr.c \
-	vrtc_expr_host.c
+	vrtc_host.c
 
 libvrtc_la_INCLUDES = \
 	vrtc_expr.h \
+	vrtc_host.h \
 	vrt-ctrl-protocol-consts.h
 
 libvrtc_la_LIBADD = \
