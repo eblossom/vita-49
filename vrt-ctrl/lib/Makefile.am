@@ -24,7 +24,8 @@ AM_LDFLAGS = -Wl,-Map -Wl,$@.map
 lib_LTLIBRARIES = libvrtc.la
 
 libvrtc_la_SOURCES = \
-	vrtc_expr.c
+	vrtc_expr.c \
+	vrtc_expr_host.c
 
 libvrtc_la_INCLUDES = \
 	vrtc_expr.h \

@@ -1,6 +1,8 @@
 #include "vrtc_expr.h"
 #include "vrt-ctrl-protocol-consts.h"
 
+/* Routines used by both host and device code */
+
 static void *
 _alloc_expr(void)
 {
@@ -176,44 +178,5 @@ vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
 
   vrtc_free_expr(seq);	// free seq and contents
   return 0;
-}
-
-// ------------------------------------------------------------------------
-
-static Expr_t *
-_vrtc_make_call(int invocation_id, Expr_t *opcode_and_args)
-{
-  return vrtc_make_seq3(vrtc_make_int(vrtc_CALL),
-			vrtc_make_int(invocation_id),
-			opcode_and_args);
-}
-
-static Expr_t *
-_vrtc_make_get_helper(int invocation_id, const char *path, int opcode)
-{
-  return _vrtc_make_call(invocation_id, 
-			 vrtc_make_seq2(vrtc_make_int(opcode),
-					vrtc_make_cstring(path)));
-}
-
-Expr_t *
-vrtc_make_get(int invocation_id, const char *path)
-{
-  return _vrtc_make_get_helper(invocation_id, path, vrtc_GET);
-}
-
-Expr_t *
-vrtc_make_get_meta(int invocation_id, const char *path)
-{
-  return _vrtc_make_get_helper(invocation_id, path, vrtc_GET_META);
-}
-
-Expr_t *
-vrtc_make_put(int invocation_id, const char *path, Expr_t *v)
-{
-  return _vrtc_make_call(invocation_id, 
-			 vrtc_make_seq3(vrtc_make_int(vrtc_PUT),
-					vrtc_make_cstring(path),
-					v));
 }
 
