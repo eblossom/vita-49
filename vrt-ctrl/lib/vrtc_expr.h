@@ -95,15 +95,29 @@ typedef asn_enc_rval_t	vrtc_enc_rval_t;
 typedef asn_dec_rval_t  vrtc_dec_rval_t;
 typedef asn_app_consume_bytes_f vrtc_app_consume_bytes_t;
 
+/*!
+ * \brief encode an Expr_t into the on-the-wire format
+ *
+ * \param[input] e is the Expr_t to be encoded
+ * \param consume_bytes_cb is the function to receive the bytes generated
+ * \param cb_arg is the additional argument passed to the callback
+ */
 vrtc_enc_rval_t
 vrtc_encode(Expr_t *e,
 	    vrtc_app_consume_bytes_t *consume_bytes_cb,
 	    void *cb_arg);
 
+/*!
+ * \brief decode on-the-wire format into an Expr_t
+ *
+ * \param[output] e is the decoded Expr_t
+ * \param[input] buffer is the data to be decoded
+ * \param[input] size is the number of bytes in \p buffer
+ */
 vrtc_dec_rval_t
-vrtc_decode(Expr_t **e,		/* [output] decoded Expr_t */
-	    const void *buffer,	/* [input] data to be decoded */
-	    size_t size);		/* [input] # of bytes in buffer */
+vrtc_decode(Expr_t **e,
+	    const void *buffer,
+	    size_t size);
 
 /*
  * ------------------------------------------------------------------------
