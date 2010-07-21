@@ -18,7 +18,7 @@
 include $(top_srcdir)/Makefile.common
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
-AM_LDFLAGS = -Wl,-Map -Wl,$@.map
+#AM_LDFLAGS = -Wl,-Map -Wl,$@.map
 
 
 lib_LTLIBRARIES = libvrtccommon.la
@@ -29,9 +29,4 @@ libvrtccommon_la_SOURCES = \
 
 libvrtccommon_la_LIBADD = \
 	../libasn1c/libasn1c.la
-
-noinst_PROGRAMS = encode_Expr
-
-encode_Expr_SOURCES = encode_Expr.c
-encode_Expr_LDADD = libvrtccommon.la
 
