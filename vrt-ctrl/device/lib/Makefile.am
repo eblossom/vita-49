@@ -21,8 +21,10 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 #AM_LDFLAGS = -Wl,-Map -Wl,$@.map
 
 
-noinst_PROGRAMS = encode_Expr
+lib_LTLIBRARIES = libvrtc-device.la
 
-encode_Expr_SOURCES = encode_Expr.c
-encode_Expr_LDADD = ../lib/libvrtc-host.la
+libvrtc_device_la_SOURCES =
+
+libvrtc_device_la_LIBADD = \
+	../../common/lib/libvrtc-common.la
 

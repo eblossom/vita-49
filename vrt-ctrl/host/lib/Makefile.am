@@ -17,4 +17,14 @@
 
 include $(top_srcdir)/Makefile.common
 
+AM_CPPFLAGS = -I$(top_srcdir)/include
+#AM_LDFLAGS = -Wl,-Map -Wl,$@.map
+
+
+lib_LTLIBRARIES = libvrtc-host.la
+
+libvrtc_host_la_SOURCES =
+
+libvrtc_host_la_LIBADD = \
+	../../common/lib/libvrtc-common.la
 

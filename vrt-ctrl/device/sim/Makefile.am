@@ -17,12 +17,3 @@
 
 include $(top_srcdir)/Makefile.common
 
-AM_CPPFLAGS = -I$(top_srcdir)/include
-#AM_LDFLAGS = -Wl,-Map -Wl,$@.map
-
-
-noinst_PROGRAMS = encode_Expr
-
-encode_Expr_SOURCES = encode_Expr.c
-encode_Expr_LDADD = ../lib/libvrtc-host.la
-

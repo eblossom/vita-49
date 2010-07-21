@@ -22,5 +22,5 @@ EXTRA_DIST = \
 	configure \
 	config.h.in
 
-SUBDIRS = m4 protocol common host
+SUBDIRS = m4 protocol common host device
 

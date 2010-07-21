@@ -21,12 +21,12 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 #AM_LDFLAGS = -Wl,-Map -Wl,$@.map
 
 
-lib_LTLIBRARIES = libvrtccommon.la
+lib_LTLIBRARIES = libvrtc-common.la
 
-libvrtccommon_la_SOURCES = \
+libvrtc_common_la_SOURCES = \
 	expr.c \
 	host_prims.c
 
-libvrtccommon_la_LIBADD = \
+libvrtc_common_la_LIBADD = \
 	../libasn1c/libasn1c.la
 
