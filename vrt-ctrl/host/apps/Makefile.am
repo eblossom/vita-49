@@ -17,10 +17,3 @@
 
 include $(top_srcdir)/Makefile.common
 
-EXTRA_DIST = \
-	bootstrap \
-	configure \
-	config.h.in
-
-SUBDIRS = m4 protocol common host
-

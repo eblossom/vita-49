@@ -103,6 +103,9 @@ AC_CONFIG_FILES([\
     common/Makefile \
     common/lib/Makefile \
     common/libasn1c/Makefile \
+    host/Makefile \
+    host/lib/Makefile \
+    host/apps/Makefile \
     protocol/Makefile \
 ])
 
