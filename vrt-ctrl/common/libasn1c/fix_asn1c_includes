@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+
+import sys
+import os.path
+import re
+
+def fix_include(f, pat):
+    lines = open(f).readlines()
+    #new_file = open(f + '.new', 'w')
+    new_file = open(f, 'w')
+    for s in lines:
+        s = pat.sub(r'#include <vrtc/asn1c/\1>', s)
+        new_file.write(s)
+    
+def main():
+    files = sys.argv[1:]
+    h_files = []
+    for arg in files:
+        if arg.endswith('.h'):
+            h_files.append(os.path.basename(arg))
+
+    # print h_files
+
+    pat_head = r'#[ \t]*include[ \t]*[<"]('
+    pat_middle = '|'.join(h_files)
+    pat_tail = r')[>"]'
+
+    pat = re.compile(pat_head + pat_middle + pat_tail)
+
+    for f in files:
+        fix_include(f, pat)
+    
+
+if __name__ == '__main__':
+    main()

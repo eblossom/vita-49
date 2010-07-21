@@ -1,6 +1,6 @@
 include $(top_srcdir)/Makefile.common
 
-AM_CPPFLAGS = -I$(top_srcdir)/common/libasn1c
+AM_CPPFLAGS = -I$(top_srcdir)/include
 
 asn_module_sources=	\
 	Expr.c	\
@@ -74,12 +74,14 @@ asn_module_sources+=per_encoder.c
 
 noinst_LTLIBRARIES=libasn1c.la
 libasn1c_la_SOURCES=$(asn_module_sources)
-libasn1c_la_INCLUDES=$(asn_module_headers)
+#libasn1c_la_INCLUDES=$(asn_module_headers)
 
-DISTCLEANFILES = $(asn_module_sources) $(asn_module_headers) converter-sample.c
+#DISTCLEANFILES = $(asn_module_sources) $(asn_module_headers) converter-sample.c
+DISTCLEANFILES = converter-sample.c
 
 regen: regenerate-from-asn1-source
 
 regenerate-from-asn1-source:
-	asn1c -fnative-types $(top_srcdir)/protocol/vrt-ctrl-asn1-types.asn1
-
+	asn1c -fskeletons-copy -fnative-types $(top_srcdir)/protocol/vrt-ctrl-asn1-types.asn1
+	./fix_asn1c_includes $(asn_module_headers) $(asn_module_sources)
+	for f in $(asn_module_headers); do mv $$f $(top_srcdir)/include/vrtc/asn1c; done

@@ -17,20 +17,15 @@
 
 include $(top_srcdir)/Makefile.common
 
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common/libasn1c -I.
+AM_CPPFLAGS = -I$(top_srcdir)/include
 AM_LDFLAGS = -Wl,-Map -Wl,$@.map
 
 
 lib_LTLIBRARIES = libvrtccommon.la
 
 libvrtccommon_la_SOURCES = \
-	vrtc_expr.c \
-	vrtc_host.c
-
-libvrtccommon_la_INCLUDES = \
-	vrtc_expr.h \
-	vrtc_host.h
-
+	expr.c \
+	host_prims.c
 
 libvrtccommon_la_LIBADD = \
 	../libasn1c/libasn1c.la

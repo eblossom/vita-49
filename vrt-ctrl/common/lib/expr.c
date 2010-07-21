@@ -1,4 +1,4 @@
-#include "vrtc_expr.h"
+#include <vrtc/expr.h>
 #include <vrtc/protocol-consts.h>
 
 /* Routines used by both host and device code */

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "vrtc_host.h"
+#include <vrtc/host_prims.h>
 #include <vrtc/protocol-consts.h>
 
 /* Routines used only by host code */
