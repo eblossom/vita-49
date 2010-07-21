@@ -1,5 +1,5 @@
 #include "vrtc_expr.h"
-#include "vrt-ctrl-protocol-consts.h"
+#include <vrtc/protocol-consts.h>
 
 /* Routines used by both host and device code */
 

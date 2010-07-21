@@ -17,7 +17,7 @@
  */
 
 #include "vrtc_host.h"
-#include "vrt-ctrl-protocol-consts.h"
+#include <vrtc/protocol-consts.h>
 
 /* Routines used only by host code */
 

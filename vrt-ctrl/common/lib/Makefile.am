@@ -17,7 +17,7 @@
 
 include $(top_srcdir)/Makefile.common
 
-AM_CPPFLAGS = -I$(top_srcdir)/common/libasn1c -I.
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common/libasn1c -I.
 AM_LDFLAGS = -Wl,-Map -Wl,$@.map
 
 
@@ -29,8 +29,8 @@ libvrtccommon_la_SOURCES = \
 
 libvrtccommon_la_INCLUDES = \
 	vrtc_expr.h \
-	vrtc_host.h \
-	vrt-ctrl-protocol-consts.h
+	vrtc_host.h
+
 
 libvrtccommon_la_LIBADD = \
 	../libasn1c/libasn1c.la
