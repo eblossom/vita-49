@@ -1,6 +1,6 @@
 include $(top_srcdir)/Makefile.common
 
-AM_CPPFLAGS = -I$(top_srcdir)/lib-asn1c
+AM_CPPFLAGS = -I$(top_srcdir)/common/libasn1c
 
 asn_module_sources=	\
 	Expr.c	\
@@ -81,5 +81,5 @@ DISTCLEANFILES = $(asn_module_sources) $(asn_module_headers) converter-sample.c
 regen: regenerate-from-asn1-source
 
 regenerate-from-asn1-source:
-	asn1c -fnative-types ../protocol/vrt-ctrl-asn1-types.asn1
+	asn1c -fnative-types $(top_srcdir)/protocol/vrt-ctrl-asn1-types.asn1
 

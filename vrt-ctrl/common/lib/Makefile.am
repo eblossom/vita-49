@@ -17,9 +17,26 @@
 
 include $(top_srcdir)/Makefile.common
 
-EXTRA_DIST = \
-	bootstrap \
-	configure \
-	config.h.in
+AM_CPPFLAGS = -I$(top_srcdir)/common/libasn1c -I.
+AM_LDFLAGS = -Wl,-Map -Wl,$@.map
 
-SUBDIRS = m4 protocol common
+
+lib_LTLIBRARIES = libvrtccommon.la
+
+libvrtccommon_la_SOURCES = \
+	vrtc_expr.c \
+	vrtc_host.c
+
+libvrtccommon_la_INCLUDES = \
+	vrtc_expr.h \
+	vrtc_host.h \
+	vrt-ctrl-protocol-consts.h
+
+libvrtccommon_la_LIBADD = \
+	../libasn1c/libasn1c.la
+
+noinst_PROGRAMS = encode_Expr
+
+encode_Expr_SOURCES = encode_Expr.c
+encode_Expr_LDADD = libvrtccommon.la
+

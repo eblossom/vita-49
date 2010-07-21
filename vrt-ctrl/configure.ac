@@ -100,8 +100,9 @@ GR_NO_UNDEFINED		dnl do we need the -no-undefined linker flag
 AC_CONFIG_FILES([\
     Makefile \
     m4/Makefile \
-    lib/Makefile \
-    lib-asn1c/Makefile \
+    common/Makefile \
+    common/lib/Makefile \
+    common/libasn1c/Makefile \
     protocol/Makefile \
 ])
 
