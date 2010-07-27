@@ -22,8 +22,10 @@ AM_CXXFLAGS += $(BOOST_CXXFLAGS)
 #AM_LDFLAGS = -Wl,-Map -Wl,$@.map
 
 
-bin_PROGRAMS = vrtc-dev-sim
+bin_PROGRAMS = vrtc-dev-sim-echo
 
-vrtc_dev_sim_SOURCES = dev-sim-main.cc
+#vrtc_dev_sim_SOURCES = dev-sim-main.cc
 #vrtc_dev_sim_LDADD = ../lib/libvrtc-device.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
-vrtc_dev_sim_LDADD = $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
+
+vrtc_dev_sim_echo_SOURCES = dev-sim-main.cc handle_datagram_echo.c
+vrtc_dev_sim_echo_LDADD = ../lib/libvrtc-device.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
