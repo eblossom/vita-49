@@ -64,7 +64,7 @@ int main()
       return 0;
     }
 
-    for (;;)
+    while (1)
     {
       boost::array<char, MAX_BUFFER> recv_buf;
       boost::system::error_code error;

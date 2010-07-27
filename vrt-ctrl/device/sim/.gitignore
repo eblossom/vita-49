@@ -2,3 +2,4 @@
 /Makefile.in
 vrtc-dev-sim
 vrtc-dev-sim-echo
+vrtc-dev-sim-echo-raw
