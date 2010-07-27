@@ -1,0 +1,118 @@
+VRT / MF status
+
+
+I've got an on-the-wire format defined, along with a slightly higher
+level protocol that builds on top of that (files attached).
+
+It provides 4 fundamental operations: GET, GET-META and PUT and an
+asynchronous NOTE from the device to the host (underrun, overrun, etc).
+
+Everything on the wire is described in terms of a single data type,
+Expr_t, that is currently being encoded and decode using ASN.1 DER.
+I'm currently using asn1c (http://lionet.info/asn1c) to generate the
+encoder/decoder and it's working, though by default it's dragging in a
+ton of code that we don't want (PER and XER encode/decode, and a full
+BER decoder).  I think I can chop this down to something that we can
+live with by hacking out the unneeded code, and probably writing a
+DER-only decoder for OCTET STRING.  (The general BER decoder for OCTET
+STRING (which can also decode DER) is ridiculously baroque.  This
+appears to be the result of the ASN.1 spec.)  DER (which I've spec'd
+for the wire interface) is a subset of BER, where you know the lengths
+of everything up front.  Another option is to just home brew a simpler
+tag-length-value (TLV) encoding for Expr_t that avoids ASN.1's cruft.
+
+Please take a look through vrt-ctrl-asn1-types.asn and
+vrt-ctrl-protocol.txt for the details.
+
+I think that what I've come up with can represent pretty much
+anything, without being too hard to use.  Properties are named with
+hierarchical names.  The values of the properties can be any of
+null, boolean, int, string, complex-int, float (unlikely in reality),
+complex-float (also unlikely), and sequences (like python tuples) of
+these types, including sequences recursively.
+
+
+The protocol allows the host code to recursively enumerate all the
+properties on the device (or the device proxy, in the case of a UHD,
+etc.)
+
+One of the tricky parts is the naming conventions for the attributes,
+and how they related to the organization and capabilities of the
+device.
+
+My current thinking: In general the top-level splits at a "unit"
+level, where stuff under a unit is more or less identical.  E.g.,
+OWLSKULL channel.  The represenation of the VRT "information streams",
+comes under the "unit", since the IF-DATA (or EXT-DATA if we ever had
+any), is the guts of the information stream (per VRT spec).
+
+This gives us paths something like:
+
+  /unit/<unit-number>/is/<info-stream-stream-id>/...
+  /unit/0x7/is/0x0/freq          # set/get the frequency on unit (channel) 0x7
+  /unit/0x7/is/0x0/stream-ctrl   # start, stop streaming (e.g., start
+                                 #   streaming at time T)
+
+
+On something like MF, where there's a single unit but two information
+streams under it (beamformed and interleaved), but a single LO that
+controls the frequency of both information streams you'd get something
+like:
+
+  /unit/0x0/freq
+  /unit/0x0/is/0x0/stream-ctrl		# start stop beamformer stream
+  /unit/0x0/is/0x0/beamformer		# set beamformer taps here
+  /unit/0x0/is/0x1/stream-ctrl		# start stop interleaver stream
+
+
+Another question/option, is for those IF context packets associated
+with particular stream-id's, to use the stream-id as part of the path,
+and the name of attribute as the leaf name.  E.g.,
+
+  /unit/0x0/sid/0x13/freq
+
+This gives an effectively flat namespace under sid (stream-id) that
+corresponds directly to all the VRT stuff (IF context packets with
+particular stream-ids).  Note that the device also sends a list of
+"associations" in it's IF-Context that tells quite a bit about the
+topology of the device guts.
+
+It's possible to do one or more of these simultaneously (basically
+multiple names for the same thing), but I'm kind of mixed about that.
+On one hand, it's a straight-forward mapping for attributes where we
+are using IF Context packets to describe them, while the previous
+mechanism allows us to control things that don't have context packets
+(i.e., beamformer taps).
+
+
+From the point of view of "device agnostic" host code, I think that in
+general, it just finds leaves with well known names such as freq, gain,
+and works with them.  (There are about 30 kinds of fields in
+IF-Context packets, and we'd use straight-forward naming convention
+for them)
+
+For code that knows all the details of a device (e.g., factory test,
+cal, etc), it uses the same interface, but uses potentially
+non-standard leaf names.
+
+
+With regard to the code organization, I'm currently building a common
+library, a host-only library, and a device-only library.  The common
+and device-only libraries are in C and are designed for resource
+constrained environments.  The common library includes the encode/decode
+routines, as well as the code that builds and parses the requests
+and responses.  The host library builds on the common library, but
+does most of its work in C++ and assumes the existence of POSIX stuff
+and boost.
+
+I'm also building a host-based device simulator that uses the common
+and device libraries, but uses bsd sockets for the transport instead
+of whatever device specific magic is required.  This allows me to get
+the device stuff sorted out in a friendly environment, and will also
+provide an example of how to build real device code.
+
+The guts of the device side is common to all devices and handles the
+mapping of the requests and paths to pointers-to-functions that
+perform the actual GET/PUT -> hardware.  A device builder will just
+have to provide a few tables that map the paths into their function
+pointers that do the actual work.  (Details still to be worked out.)
