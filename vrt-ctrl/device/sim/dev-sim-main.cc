@@ -74,6 +74,7 @@ int main()
       if (error && error != boost::asio::error::message_size)
         throw boost::system::system_error(error);
 
+      //std::cerr << "dev-sim: recv len = " << len << std::endl;
       vrtcd_handle_incoming_datagram(&recv_buf[0], len,
 				     dev_sim_send_datagram, &st, MAX_BUFFER);
     }

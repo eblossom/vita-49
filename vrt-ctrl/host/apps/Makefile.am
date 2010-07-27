@@ -17,12 +17,14 @@
 
 include $(top_srcdir)/Makefile.common
 
-AM_CPPFLAGS = -I$(top_srcdir)/include
-#AM_LDFLAGS = -Wl,-Map -Wl,$@.map
+AM_CPPFLAGS = -I$(top_srcdir)/include $(BOOST_CPPFLAGS)
+AM_CXXFLAGS += $(BOOST_CXXFLAGS)
 
 
-noinst_PROGRAMS = encode_Expr
+noinst_PROGRAMS = encode_Expr vrtc-ping
 
 encode_Expr_SOURCES = encode_Expr.c
 encode_Expr_LDADD = ../lib/libvrtc-host.la
 
+vrtc_ping_SOURCES = vrtc-ping.cc
+vrtc_ping_LDADD = ../lib/libvrtc-host.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
