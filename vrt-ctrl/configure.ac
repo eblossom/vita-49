@@ -97,6 +97,45 @@ m4_ifdef([LT_INIT],[LT_INIT],[AC_PROG_LIBTOOL])
 GR_NO_UNDEFINED		dnl do we need the -no-undefined linker flag
 
 
+dnl FIXME Not needed if --enable-device-only
+dnl
+dnl We require the boost headers, thread lib and date_time lib.
+dnl AX_BOOST_BASE finds the headers and the lib dir (-L<foo>)
+dnl
+dnl calls AC_SUBST(BOOST_CPPFLAGS), AC_SUBST(BOOST_LDFLAGS) and defines HAVE_BOOST
+dnl
+dnl Current Boost version requirement is >=1.35 for all platforms except Darwin,
+dnl which requires >=1.37 for code in usrp host library.
+case "$host_os" in
+     darwin*)
+        AX_BOOST_BASE([1.37])
+        ;;
+      *)
+        AX_BOOST_BASE([1.35])
+        ;;
+esac
+
+dnl calls AC_SUBST(BOOST_THREAD_LIB), AC_SUBST(BOOST_CXXFLAGS) and defines HAVE_BOOST_THREAD
+AX_BOOST_THREAD
+dnl CXXFLAGS="$CXXFLAGS $BOOST_CXXFLAGS"       dnl often picks up a -pthread or something similar
+dnl CFLAGS="$CFLAGS $BOOST_CXXFLAGS"           dnl often picks up a -pthread or something similar
+
+dnl
+dnl all the rest of these call AC_SUBST(BOOST_<foo>_LIB) and define HAVE_BOOST_<foo>
+dnl
+dnl AX_BOOST_DATE_TIME
+dnl AX_BOOST_FILESYSTEM
+dnl AX_BOOST_IOSTREAMS
+AX_BOOST_PROGRAM_OPTIONS
+dnl AX_BOOST_REGEX
+dnl AX_BOOST_SERIALIZATION
+dnl AX_BOOST_SIGNALS
+AX_BOOST_SYSTEM
+dnl AX_BOOST_TEST_EXEC_MONITOR
+dnl AX_BOOST_UNIT_TEST_FRAMEWORK
+dnl AX_BOOST_WSERIALIZATION
+
+
 AC_CONFIG_FILES([\
     Makefile \
     m4/Makefile \
