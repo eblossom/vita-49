@@ -34,12 +34,9 @@ enum { MAX_BUFFER = 1500 };
 
 struct server_state {
   server_state(boost::asio::io_service &io) :
-    socket(io, udp::v4())
-  {
-  }
+    socket(io, udp::v4()) { }
   udp::socket	socket;
   udp::endpoint remote_endpoint;
-
 };
 
 extern "C" {
