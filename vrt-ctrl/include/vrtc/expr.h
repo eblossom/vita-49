@@ -28,6 +28,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 #include <vrtc/asn1c/Expr.h>
+#include <vrtc/datagram_buffer.h>
 
 /*! 
  * \brief Free Expr_t \p p and any contained elements 
@@ -91,21 +92,21 @@ Expr_t *vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3);
  * -------------------------------------------------------------------------
  */
 
-typedef asn_enc_rval_t	vrtc_enc_rval_t;
 typedef asn_dec_rval_t  vrtc_dec_rval_t;
-typedef asn_app_consume_bytes_f vrtc_app_consume_bytes_t;
 
 /*!
  * \brief encode an Expr_t into the on-the-wire format
  *
  * \param[input] e is the Expr_t to be encoded
- * \param consume_bytes_cb is the function to receive the bytes generated
- * \param cb_arg is the additional argument passed to the callback
+ * \param[input] dest is the datagram_buffer where the encoded Expr_t is written.
+ *
+ * \returns true iff \p e was encoded successfully.
+ *
+ * It will fail if there's a problem with \p e, or if the encoded representation
+ * is bigger than the maximum datagram.
  */
-vrtc_enc_rval_t
-vrtc_encode(Expr_t *e,
-	    vrtc_app_consume_bytes_t *consume_bytes_cb,
-	    void *cb_arg);
+bool
+vrtc_encode(Expr_t *e, datagram_buffer_t *dest);
 
 /*!
  * \brief decode on-the-wire format into an Expr_t

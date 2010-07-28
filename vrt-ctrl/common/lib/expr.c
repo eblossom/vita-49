@@ -181,14 +181,35 @@ vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
 }
 
 
-vrtc_enc_rval_t
-vrtc_encode(Expr_t *e,
-	    vrtc_app_consume_bytes_t *consume_bytes_cb,
-	    void *cb_arg)
+static int 
+der_encoder_write_shim(const void *buf, size_t size, void *app_key)
 {
-  vrtc_enc_rval_t rval;
-  rval = der_encode(&asn_DEF_Expr, e, consume_bytes_cb, cb_arg);
-  return rval;
+  datagram_buffer_t *dest = (datagram_buffer_t *) app_key;
+  return datagram_buffer_write(dest, buf, size) ? 0 : -1;
+}
+
+bool
+vrtc_encode(Expr_t *e, datagram_buffer_t *dest)
+{
+  asn_enc_rval_t rval;
+
+  // Determine number of bytes required to represent e.
+  rval = der_encode(&asn_DEF_Expr, e, 0, 0);
+  if (rval.encoded == -1){	// some kind of problem
+    // FIXME figure out what's wrong (trouble with expr?)
+    return false;
+  }
+
+  size_t len = rval.encoded;
+  if (!datagram_buffer_ensure_room(dest, len))	// won't fit
+    return false;
+
+  rval = der_encode(&asn_DEF_Expr, e, der_encoder_write_shim, dest);
+  if (rval.encoded == -1){	// some kind of problem
+    // FIXME figure out what's wrong
+    return false;
+  }
+  return true;
 }
 
 

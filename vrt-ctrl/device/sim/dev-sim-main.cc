@@ -30,7 +30,7 @@
 using boost::asio::ip::udp;
 
 
-enum { MAX_BUFFER = 1500 };
+enum { MAX_PAYLOAD = 1500 - 28 };	// MAX UDP payload on typical ethernet
 
 struct server_state {
   server_state(boost::asio::io_service &io) :
@@ -66,7 +66,7 @@ int main()
 
     while (1)
     {
-      boost::array<char, MAX_BUFFER> recv_buf;
+      boost::array<char, MAX_PAYLOAD> recv_buf;
       boost::system::error_code error;
       size_t len = st.socket.receive_from(boost::asio::buffer(recv_buf),
 					  st.remote_endpoint, 0, error);
@@ -76,7 +76,7 @@ int main()
 
       //std::cerr << "dev-sim: recv len = " << len << std::endl;
       vrtcd_handle_incoming_datagram(&recv_buf[0], len,
-				     dev_sim_send_datagram, &st, MAX_BUFFER);
+				     dev_sim_send_datagram, &st, MAX_PAYLOAD);
     }
   }
   catch (std::exception& e)
