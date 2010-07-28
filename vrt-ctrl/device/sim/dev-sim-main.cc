@@ -32,8 +32,8 @@ using boost::asio::ip::udp;
 
 enum { MAX_PAYLOAD = 1500 - 28 };	// MAX UDP payload on typical ethernet
 
-struct server_state {
-  server_state(boost::asio::io_service &io) :
+struct udp_state {
+  udp_state(boost::asio::io_service &io) :
     socket(io, udp::v4()) { }
   udp::socket	socket;
   udp::endpoint remote_endpoint;
@@ -42,10 +42,10 @@ struct server_state {
 extern "C" {
   void dev_sim_send_datagram(void *handle, const void *buf, size_t len)
   {
-    server_state *ss = (server_state *) handle;
+    udp_state *us = (udp_state *) handle;
     boost::system::error_code ignored_error;
-    ss->socket.send_to(boost::asio::buffer(buf, len),
-		       ss->remote_endpoint, 0, ignored_error);
+    us->socket.send_to(boost::asio::buffer(buf, len),
+		       us->remote_endpoint, 0, ignored_error);
   }
 }
 
@@ -54,10 +54,10 @@ int main()
   try
   {
     boost::asio::io_service io_service;
-    server_state st(io_service);
+    udp_state us(io_service);
     boost::system::error_code ec;
 
-    st.socket.bind(udp::endpoint(udp::v4(), VRTC_UDP_CTRL_PORT), ec);
+    us.socket.bind(udp::endpoint(udp::v4(), VRTC_UDP_CTRL_PORT), ec);
     if (ec){
       std::cerr << ec.message() << ": Failed to bind udp socket on port "
 		<< VRTC_UDP_CTRL_PORT << std::endl;
@@ -68,15 +68,15 @@ int main()
     {
       boost::array<char, MAX_PAYLOAD> recv_buf;
       boost::system::error_code error;
-      size_t len = st.socket.receive_from(boost::asio::buffer(recv_buf),
-					  st.remote_endpoint, 0, error);
+      size_t len = us.socket.receive_from(boost::asio::buffer(recv_buf),
+					  us.remote_endpoint, 0, error);
 
       if (error && error != boost::asio::error::message_size)
         throw boost::system::system_error(error);
 
       //std::cerr << "dev-sim: recv len = " << len << std::endl;
       vrtcd_handle_incoming_datagram(&recv_buf[0], len,
-				     dev_sim_send_datagram, &st, MAX_PAYLOAD);
+				     dev_sim_send_datagram, &us, MAX_PAYLOAD);
     }
   }
   catch (std::exception& e)
