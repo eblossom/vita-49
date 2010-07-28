@@ -25,7 +25,8 @@ lib_LTLIBRARIES = libvrtc-common.la
 
 libvrtc_common_la_SOURCES = \
 	expr.c \
-	host_prims.c
+	host_prims.c \
+	datagram_buffer.c
 
 libvrtc_common_la_LIBADD = \
 	../libasn1c/libasn1c.la
