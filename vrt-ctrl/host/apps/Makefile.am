@@ -21,7 +21,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include $(BOOST_CPPFLAGS)
 AM_CXXFLAGS += $(BOOST_CXXFLAGS)
 
 
-noinst_PROGRAMS = encode_Expr vrtc-ping-raw vrtc-ping
+noinst_PROGRAMS = encode_Expr vrtc-ping-raw vrtc-ping vrtc-enumerate
 
 encode_Expr_SOURCES = encode_Expr.c
 encode_Expr_LDADD = ../lib/libvrtc-host.la
@@ -31,3 +31,6 @@ vrtc_ping_raw_LDADD = ../lib/libvrtc-host.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB
 
 vrtc_ping_SOURCES = vrtc-ping.cc
 vrtc_ping_LDADD = ../lib/libvrtc-host.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
+
+vrtc_enumerate_SOURCES = vrtc-enumerate.cc
+vrtc_enumerate_LDADD = ../lib/libvrtc-host.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
