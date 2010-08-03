@@ -29,5 +29,5 @@ encode_Expr_LDADD = ../lib/libvrtc-host.la
 vrtc_ping_raw_SOURCES = vrtc-ping-raw.cc
 vrtc_ping_raw_LDADD = ../lib/libvrtc-host.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
 
-vrtc_ping_SOURCES = vrtc-ping-raw.cc
+vrtc_ping_SOURCES = vrtc-ping.cc
 vrtc_ping_LDADD = ../lib/libvrtc-host.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
