@@ -1,6 +1,8 @@
 #include <iostream>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include <vrtc/ports.h>
 
 using boost::asio::ip::udp;
@@ -12,17 +14,57 @@ enum { MAX_PAYLOAD = 1500 - 28 };	// MAX UDP payload on typical ethernet
 
 class connection
 {
+  udp::socket			d_socket;
+  char 				d_data[MAX_PAYLOAD];
+
+  boost::function<void (const boost::system::error_code &error,
+			const void *buffer,
+			std::size_t bytes_transfered)> d_recv_handler;
+  
+  void handle_receive(const boost::system::error_code &error,
+		      std::size_t bytes_transfered)
+  {
+    d_recv_handler(error, d_data, bytes_transfered);
+    d_socket.async_receive(boost::asio::buffer(d_data, MAX_PAYLOAD),
+			   boost::bind(&connection::handle_receive, this,
+				       boost::asio::placeholders::error,
+				       boost::asio::placeholders::bytes_transferred));
+  }
+
 public:
   connection(boost::asio::io_service &io, const std::string &hostname) :
     d_socket(io, udp::v4())
   { 
     udp::resolver resolver(io);
     udp::resolver::query query(udp::v4(), hostname, STRINGIFY(VRTC_UDP_CTRL_PORT));
-    d_remote_endpoint = *resolver.resolve(query);
-    d_socket.connect(d_remote_endpoint);
+    udp::endpoint remote_endpoint = *resolver.resolve(query);
+    d_socket.connect(remote_endpoint);
   }
-  udp::socket	d_socket;
-  udp::endpoint d_remote_endpoint;
+
+  template<typename RecvHandler>
+  void start_receive(RecvHandler recv_handler)
+  {
+    d_recv_handler = recv_handler;
+    d_socket.async_receive(boost::asio::buffer(d_data, MAX_PAYLOAD),
+			   boost::bind(&connection::handle_receive, this,
+				       boost::asio::placeholders::error,
+				       boost::asio::placeholders::bytes_transferred));
+  }
+
+  template<typename ConstBufferSequence>
+  std::size_t send(const ConstBufferSequence &buffers,
+		   boost::system::error_code &error)
+  {
+    return d_socket.send(buffers, 0, error);
+  }
+
+  template<typename ConstBufferSequence, typename WriteHandler>
+  void async_send(const ConstBufferSequence &buffers,
+		  WriteHandler handler)
+  {
+    d_socket.async_send(buffers, 0, handler);
+  }
+
 };
 
 extern "C" {
@@ -30,9 +72,41 @@ extern "C" {
   {
     connection *conn = (connection *) handle;
     boost::system::error_code ignored_error;
-    conn->d_socket.send(boost::asio::buffer(buf, len), 0, ignored_error);
+    conn->send(boost::asio::buffer(buf, len), ignored_error);
   }
 }
+
+// ------------------------------------------------------------------------
+
+class control {
+  connection d_conn;
+
+public:
+  control(boost::asio::io_service &io_service,
+	  const std::string &hostname)
+    : d_conn(io_service, hostname)
+  {
+    d_conn.start_receive(boost::bind(&control::handle_rcvd_control_pkt, this,
+				     _1, _2, _3));
+    send_packet();
+  }
+
+  void
+  send_packet()
+  {
+    boost::system::error_code ignored_error;
+    d_conn.send(boost::asio::buffer(std::string("Hello VRTC!\n")), ignored_error);
+  }
+
+  void
+  handle_rcvd_control_pkt(const boost::system::error_code &error,
+			  const void *buffer, std::size_t bytes_transferred)
+  {
+    //std::cout << "vrtc-enumerate: recv len = " << bytes_transferred << std::endl;
+    std::cout.write((const char *) buffer, bytes_transferred);
+    send_packet();
+  }
+};
 
 int main(int argc, char* argv[])
 {
@@ -44,17 +118,9 @@ int main(int argc, char* argv[])
       }
 
     boost::asio::io_service io_service;
-    connection conn(io_service, argv[1]);
+    control ctrl(io_service, argv[1]);
 
-    while (1){
-      conn.d_socket.send(boost::asio::buffer(std::string("Hello VRTC!\n")));
-
-      boost::array<char, 1024> recv_buf;
-      size_t len = conn.d_socket.receive(boost::asio::buffer(recv_buf));
-      //std::cerr << "vrtc-ping: recv len = " << len << std::endl;
-
-      std::cout.write(recv_buf.data(), len);
-    }
+    io_service.run();
   }
   catch (std::exception& e) {
     std::cerr << e.what() << std::endl;
