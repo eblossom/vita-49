@@ -18,11 +18,18 @@
 #ifndef INCLUDED_VRTC_HOST_H
 #define INCLUDED_VRTC_HOST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <vrtc/expr.h>
 
 Expr_t *vrtc_make_get(int invocation_id, const char *path);
 Expr_t *vrtc_make_get_meta(int invocation_id, const char *path);
 Expr_t *vrtc_make_put(int invocation_id, const char *path, Expr_t *v);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INCLUDED_VRTC_HOST_H */

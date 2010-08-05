@@ -6,6 +6,7 @@
 #include <vrtc/ports.h>
 #include <vrtc/datagram_buffer.h>
 #include <vrtc/expr.h>
+#include <vrtc/host_prims.h>
 #include "udp_connection.h"
 #include <cstdio>
 
@@ -134,11 +135,22 @@ public:
     send_packet();
   }
 
+  int alloc_inv_id()
+  {
+    return 0;	// FIXME
+  }
+
+  void free_inv_id(int inv_id)
+  {
+    // FIXME
+  }
+
   void
   send_packet()
   {
-    boost::system::error_code ignored_error;
-    d_conn.send(boost::asio::buffer(std::string("Hello VRTC!\n")), ignored_error);
+    Expr_t *e = vrtc_make_get(alloc_inv_id(), "/");
+    d_conn.encode_and_flush(e);
+    vrtc_free_expr(e);
   }
 
   void
