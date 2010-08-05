@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef INCLUDED_VRTC_DATAGRAM_BUFFER_H
-#define INCLUDED_VTTC_DATAGRAM_BUFFER_H
+#define INCLUDED_VRTC_DATAGRAM_BUFFER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,9 +24,6 @@ extern "C" {
 
 #include <vrtc/send_datagram.h>  
 #include <stdbool.h>
-
-  struct datagram_buffer;
-  typedef struct datagram_buffer datagram_buffer_t;
 
   struct datagram_buffer {
     // private:
@@ -37,6 +34,7 @@ extern "C" {
     send_datagram_t		send;	// function to send a datagram
     send_datagram_handle_t	handle;	// first arg for send
   };
+  typedef struct datagram_buffer datagram_buffer_t;
 
   void datagram_buffer_init(datagram_buffer_t *self,
 			    void *buf, size_t len,

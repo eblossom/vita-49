@@ -4,74 +4,119 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <vrtc/ports.h>
+#include <vrtc/datagram_buffer.h>
+#include <vrtc/expr.h>
+#include "udp_connection.h"
+#include <cstdio>
 
-using boost::asio::ip::udp;
-
-enum { MAX_PAYLOAD = 1500 - 28 };	// MAX UDP payload on typical ethernet
-
-#define STRINGIFY(x) _STRINGIFY(x)
-#define _STRINGIFY(x) #x
-
-class connection
+static void
+print_hex (FILE *fp, unsigned char *buf, int len)
 {
-  udp::socket			d_socket;
-  char 				d_data[MAX_PAYLOAD];
+  for (int i = 0; i < len; i++){
+    fprintf (fp, "%02x ", buf[i]);
+  }
+  fprintf (fp, "\n");
+}
 
-  boost::function<void (const boost::system::error_code &error,
-			const void *buffer,
-			std::size_t bytes_transfered)> d_recv_handler;
+extern "C" void expr_conn_send_datagram(void *handle, const void *buf, size_t len);
+
+class expr_connection : public vrtc::udp_connection
+{
+  char 			d_rx_data[MAX_PAYLOAD];
+  char 			d_tx_data[MAX_PAYLOAD];
+  datagram_buffer_t	d_datagram_buffer;	// buffers partially constructed datagram
+  boost::function<
+    void (const boost::system::error_code &error, const Expr_t *expr)> d_expr_handler;
   
-  void handle_receive(const boost::system::error_code &error,
-		      std::size_t bytes_transfered)
+  void handle_rcvd_payload(const boost::system::error_code &error,
+			   std::size_t bytes_transferred)
   {
-    d_recv_handler(error, d_data, bytes_transfered);
-    d_socket.async_receive(boost::asio::buffer(d_data, MAX_PAYLOAD),
-			   boost::bind(&connection::handle_receive, this,
-				       boost::asio::placeholders::error,
-				       boost::asio::placeholders::bytes_transferred));
+    if (error){
+      // FIXME, print it out
+      std::cerr << "expr_connection: handle_rcvd_payload: error... "
+		<< std::endl;
+    }
+    else {
+      decode_payload(d_rx_data, bytes_transferred);
+      
+      // Fire off next async receive
+      async_receive(boost::asio::buffer(d_rx_data, MAX_PAYLOAD),
+		    boost::bind(&expr_connection::handle_rcvd_payload, this,
+				boost::asio::placeholders::error,
+				boost::asio::placeholders::bytes_transferred));
+    }
+  }
+
+  void decode_payload(const void *payload, std::size_t len)
+  {
+    // Decode all Expr's in payload.
+    // Call d_expr_handler for each one
+
+    print_hex(stdout, (unsigned char *) payload, len);
+
   }
 
 public:
-  connection(boost::asio::io_service &io, const std::string &hostname) :
-    d_socket(io, udp::v4())
-  { 
-    udp::resolver resolver(io);
-    udp::resolver::query query(udp::v4(), hostname, STRINGIFY(VRTC_UDP_CTRL_PORT));
-    udp::endpoint remote_endpoint = *resolver.resolve(query);
-    d_socket.connect(remote_endpoint);
+  /*!
+   * \brief Establish a control connection to a VRT device.
+   *
+   * \param io_service The io_service object that the expr_connection will use
+   * to dispatch handlers for all asynchrnous operations performed.
+   *
+   * \param hostname   The hostname or numeric IP address of the device
+   *
+   * \param handler The handler to be called on every Expr_t received.
+   * Copies will be made of the handler as required.  The function
+   * signature of the handler must be:
+   * <code> void handler(const boost::system::error_code &error, const Expr_t *e); </code>
+   */
+  template<typename ExprHandler>
+  expr_connection(boost::asio::io_service &io,
+		  const std::string &hostname,
+		  ExprHandler handler)
+    : vrtc::udp_connection(io, hostname),
+      d_expr_handler(handler)
+  {
+    datagram_buffer_init(&d_datagram_buffer, d_tx_data, sizeof(d_tx_data),
+			 expr_conn_send_datagram, (void *) this);
+    
+    // Fire off the first async receive
+    async_receive(boost::asio::buffer(d_rx_data, MAX_PAYLOAD),
+		  boost::bind(&expr_connection::handle_rcvd_payload, this,
+			      boost::asio::placeholders::error,
+			      boost::asio::placeholders::bytes_transferred));
   }
 
-  template<typename RecvHandler>
-  void start_receive(RecvHandler recv_handler)
+  ~expr_connection()
   {
-    d_recv_handler = recv_handler;
-    d_socket.async_receive(boost::asio::buffer(d_data, MAX_PAYLOAD),
-			   boost::bind(&connection::handle_receive, this,
-				       boost::asio::placeholders::error,
-				       boost::asio::placeholders::bytes_transferred));
+    flush();
   }
 
-  template<typename ConstBufferSequence>
-  std::size_t send(const ConstBufferSequence &buffers,
-		   boost::system::error_code &error)
+  //! Encode expr and insert in outgoing datagram
+  bool encode_and_enqueue(Expr_t *e)
   {
-    return d_socket.send(buffers, 0, error);
+    return vrtc_encode(e, &d_datagram_buffer);
   }
 
-  template<typename ConstBufferSequence, typename WriteHandler>
-  void async_send(const ConstBufferSequence &buffers,
-		  WriteHandler handler)
+  //! Encode expr, insert in outgoing datagram, and send it on its way
+  bool encode_and_flush(Expr_t *e)
   {
-    d_socket.async_send(buffers, 0, handler);
+    return encode_and_enqueue(e) && flush();
+  }
+
+  //! Send any partial datagram on its way
+  bool flush() {
+    return datagram_buffer_flush(&d_datagram_buffer);
   }
 
 };
 
 extern "C" {
-  void dev_sim_send_datagram(void *handle, const void *buf, size_t len)
+  void expr_conn_send_datagram(void *handle, const void *buf, size_t len)
   {
-    connection *conn = (connection *) handle;
+    expr_connection *conn = (expr_connection *) handle;
     boost::system::error_code ignored_error;
+    // FIXME async_send
     conn->send(boost::asio::buffer(buf, len), ignored_error);
   }
 }
@@ -79,15 +124,13 @@ extern "C" {
 // ------------------------------------------------------------------------
 
 class control {
-  connection d_conn;
+  expr_connection d_conn;
 
 public:
   control(boost::asio::io_service &io_service,
 	  const std::string &hostname)
-    : d_conn(io_service, hostname)
+    : d_conn(io_service, hostname, boost::bind(&control::handle_rcvd_expr, this, _1, _2))
   {
-    d_conn.start_receive(boost::bind(&control::handle_rcvd_control_pkt, this,
-				     _1, _2, _3));
     send_packet();
   }
 
@@ -99,11 +142,8 @@ public:
   }
 
   void
-  handle_rcvd_control_pkt(const boost::system::error_code &error,
-			  const void *buffer, std::size_t bytes_transferred)
+  handle_rcvd_expr(const boost::system::error_code &error, const Expr_t *e)
   {
-    //std::cout << "vrtc-enumerate: recv len = " << bytes_transferred << std::endl;
-    std::cout.write((const char *) buffer, bytes_transferred);
     send_packet();
   }
 };
