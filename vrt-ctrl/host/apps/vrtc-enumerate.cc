@@ -34,9 +34,8 @@ class expr_connection : public vrtc::udp_connection
 			   std::size_t bytes_transferred)
   {
     if (error){
-      // FIXME, print it out
-      std::cerr << "expr_connection: handle_rcvd_payload: error... "
-		<< std::endl;
+      std::cerr << "expr_connection: handle_rcvd_payload: error: "
+		<< error.message() << std::endl;
 
       // Pass error on to handler and don't rearm async_receive
       d_expr_handler(error, 0);
@@ -184,11 +183,13 @@ public:
   handle_rcvd_expr(const boost::system::error_code &error, const Expr_t *e)
   {
     if (error){
-      std::cerr << "handle_rcvd_expr: error: " << error;
+      std::cerr << "handle_rcvd_expr: error: " 
+		<< error.message() << std::endl;
+      // FIXME shutdown
       return;
     }
 
-    asn_fprint(stdout, &asn_DEF_Expr, e); 	// FIXME with better printer
+    asn_fprint(stdout, &asn_DEF_Expr, e); 	// FIXME better printer
     send_packet();
   }
 };
