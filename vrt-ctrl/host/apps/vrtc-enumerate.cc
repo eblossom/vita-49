@@ -9,9 +9,10 @@
 #include <vrtc/host_prims.h>
 #include "udp_connection.h"
 #include <cstdio>
+#include <cassert>
 
 static void
-print_hex (FILE *fp, unsigned char *buf, int len)
+print_hex (FILE *fp, const unsigned char *buf, int len)
 {
   for (int i = 0; i < len; i++){
     fprintf (fp, "%02x ", buf[i]);
@@ -36,6 +37,9 @@ class expr_connection : public vrtc::udp_connection
       // FIXME, print it out
       std::cerr << "expr_connection: handle_rcvd_payload: error... "
 		<< std::endl;
+
+      // Pass error on to handler and don't rearm async_receive
+      d_expr_handler(error, 0);
     }
     else {
       decode_payload(d_rx_data, bytes_transferred);
@@ -48,13 +52,33 @@ class expr_connection : public vrtc::udp_connection
     }
   }
 
-  void decode_payload(const void *payload, std::size_t len)
+  void decode_payload(const void *vpayload, std::size_t len)
   {
     // Decode all Expr's in payload.
     // Call d_expr_handler for each one
 
-    print_hex(stdout, (unsigned char *) payload, len);
+    vrtc_dec_rval_t	rval;
+    const unsigned char *payload = (unsigned char *) vpayload;
+    boost::system::error_code ok;
 
+    print_hex(stdout, payload, len);
+
+    while (len != 0){
+      Expr_t *e = 0;
+      rval = vrtc_decode(&e, payload, len);
+      if (rval.code == RC_OK){
+	d_expr_handler(ok, e);
+	vrtc_free_expr(e);
+	assert(rval.consumed <= len);
+	payload += rval.consumed;
+	len -= rval.consumed;
+      }
+      else {
+	boost::system::error_code error = make_error_code(boost::system::errc::bad_message);
+	d_expr_handler(error, 0);
+	return;
+      }
+    }
   }
 
 public:
@@ -102,7 +126,10 @@ public:
   //! Encode expr, insert in outgoing datagram, and send it on its way
   bool encode_and_flush(Expr_t *e)
   {
-    return encode_and_enqueue(e) && flush();
+    // We want to flush even if the encode fails.
+    bool r = encode_and_enqueue(e);
+    r &= flush();
+    return r;
   }
 
   //! Send any partial datagram on its way
@@ -156,6 +183,12 @@ public:
   void
   handle_rcvd_expr(const boost::system::error_code &error, const Expr_t *e)
   {
+    if (error){
+      std::cerr << "handle_rcvd_expr: error: " << error;
+      return;
+    }
+
+    asn_fprint(stdout, &asn_DEF_Expr, e); 	// FIXME with better printer
     send_packet();
   }
 };
