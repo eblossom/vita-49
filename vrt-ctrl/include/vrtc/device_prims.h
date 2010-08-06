@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef INCLUDED_VRTC_HOST_PRIMS_H
-#define INCLUDED_VRTC_HOST_PRIMS_H
+#ifndef INCLUDED_VRTC_DEVICE_PRIMS_H
+#define INCLUDED_VRTC_DEVICE_PRIMS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,12 +24,18 @@ extern "C" {
 
 #include <vrtc/expr.h>
 
-Expr_t *vrtc_make_get(int invocation_id, const char *path);
-Expr_t *vrtc_make_get_meta(int invocation_id, const char *path);
-Expr_t *vrtc_make_put(int invocation_id, const char *path, Expr_t *v);
+Expr_t *vrtc_make_reply(int invocation_id, Expr_t *v);
+Expr_t *vrtc_make_error(int invocation_id, int error_code, Expr_t *error_arg);
+Expr_t *vrtc_make_reject(int error_code);
+Expr_t *vrtc_make_reject2(int error_code, Expr_t *error_arg);
+Expr_t *vrtc_make_note(int note_kind, Expr_t *note_arg);
+
+Expr_t *vrtc_make_error_info(int error_code);
+Expr_t *vrtc_make_error_info2(int error_code, Expr_t *error_arg);
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* INCLUDED_VRTC_HOST_PRIMS_H */
+#endif /* INCLUDED_VRTC_DEVICE_PRIMS_H */

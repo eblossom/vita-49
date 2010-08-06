@@ -24,9 +24,10 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 lib_LTLIBRARIES = libvrtc-common.la
 
 libvrtc_common_la_SOURCES = \
+	datagram_buffer.c \
+	device_prims.c \
 	expr.c \
-	host_prims.c \
-	datagram_buffer.c
+	host_prims.c
 
 libvrtc_common_la_LIBADD = \
 	../libasn1c/libasn1c.la

@@ -30,6 +30,11 @@
 #define	vrtc_GET_META	1
 #define vrtc_PUT	2
 
+/* error-codes */
+
+#define	vrtc_EC_BAD_MESSAGE	1
+
+
 /* note-kind constants */
 
 #define	vrtc_DEBUG_OUTPUT	0
