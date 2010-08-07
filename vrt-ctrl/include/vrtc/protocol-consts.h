@@ -32,8 +32,8 @@
 
 /* error-codes */
 
-#define	vrtc_EC_BAD_MESSAGE	1
-
+#define	vrtc_EC_CANT_DECODE		1
+#define	vrtc_EC_UNRECOGNIZED_MSG	2
 
 /* note-kind constants */
 

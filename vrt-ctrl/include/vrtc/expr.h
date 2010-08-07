@@ -85,6 +85,10 @@ Expr_t *vrtc_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2);
  */
 Expr_t *vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3);
 
+/*!
+ * \brief Return a copy of x iff successful, else 0.
+ */
+Expr_t *vrtc_clone(Expr_t *x);
 
 /*
  * -------------------------------------------------------------------------
@@ -108,6 +112,20 @@ typedef asn_dec_rval_t  vrtc_dec_rval_t;
 bool
 vrtc_encode(Expr_t *e, datagram_buffer_t *dest);
 
+/*!
+ * \brief encode an Expr_t into the on-the-wire format and free it.
+ *
+ * \param[input] e is the Expr_t to be encoded, then freed
+ * \param[input] dest is the datagram_buffer where the encoded Expr_t is written.
+ *
+ * \returns true iff \p e was encoded successfully.
+ *
+ * It will fail if there's a problem with \p e, or if the encoded representation
+ * is bigger than the maximum datagram.
+ */
+bool
+vrtc_encode_and_free(Expr_t *e, datagram_buffer_t *dest);
+  
 /*!
  * \brief decode on-the-wire format into an Expr_t
  *

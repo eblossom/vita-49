@@ -30,12 +30,48 @@
 #define MAX_PAYLOAD (1500 - 28)	/* Maximum UDP payload on typically ethernet */
 
 
+#if 0
+bool
+msg_is_call(Expr_t *msg, int *inv_id, Expr_t **opcode_and_args)
+{
+  bool ok = (true
+	     && vrtc_is_seq(msg)
+	     && vrtc_seq_len(msg) == 3
+	     && vrtc_is_int(vrtc_seq_ref(1)));
+
+  if (ok){
+    *inv_id = vrtc_get_int(vrtc_seq_ref(1));
+    *opcode_and_args = vrtc_seq_ref(2);
+  }
+  return ok;
+}
+
 void
 vrtcd_handle_expr(Expr_t *e, datagram_buffer_t *dgbuf)
 {
-  // FIXME for now, just echo it back
-  vrtc_encode(e, dgbuf);
+  int invocation_id;
+  Expr_t *opcode_and_args = 0;
+  Expr_t *path = 0;
+  Expr_t *v = 0;
+
+  if (!msg_is_call(e), &invocation_id, &opcode_and_args){
+  unrecognized_msg:
+    vrtc_encode_and_free(vrtc_make_reject2(vrtc_EC_UNRECOGNIZED_MSG,
+					   vrtc_clone(e)),
+			 dgbuf);
+    return;
+  }
+  
+  if (op_is_get(opcode_and_args, &path))
+    handle_get(path, dgbuf);
+  else if (op_is_get_meta(opcode_and_args, &path))
+    handle_get_meta(path, dgbuf);
+  else if (op_is_put(opcode_and_args, &path, &v))
+    handle_put(path, v, dgbuf);
+  else
+    goto unrecognized_msg;
 }
+#endif
 
 void
 vrtcd_handle_incoming_datagram(void *buf, size_t len,
@@ -51,7 +87,7 @@ vrtcd_handle_incoming_datagram(void *buf, size_t len,
     Expr_t *e = 0;
     vrtc_dec_rval_t rval = vrtc_decode(&e, payload, len);
     if (rval.code == RC_OK){
-      vrtcd_handle_expr(e, &dgbuf);
+      // vrtcd_handle_expr(e, &dgbuf);
       vrtc_free_expr(e);
       assert(rval.consumed <= len);
       payload += rval.consumed;
@@ -59,9 +95,7 @@ vrtcd_handle_incoming_datagram(void *buf, size_t len,
     }
     else {
       /* Something's hosed with the payload.  Send a REJECT */
-      Expr_t *e = vrtc_make_reject(vrtc_EC_BAD_MESSAGE);
-      vrtc_encode(e, &dgbuf);
-      vrtc_free_expr(e);
+      vrtc_encode_and_free(vrtc_make_reject(vrtc_EC_CANT_DECODE), &dgbuf);
       break;
     }
   }

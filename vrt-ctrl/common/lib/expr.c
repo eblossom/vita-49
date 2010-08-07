@@ -181,6 +181,13 @@ vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
 }
 
 
+Expr_t *
+vrtc_clone(Expr_t *x)
+{
+  // FIXME decode(encode(x)) or equivalent
+  return vrtc_make_int(99999);
+}
+
 static int 
 der_encoder_write_shim(const void *buf, size_t size, void *app_key)
 {
@@ -210,6 +217,14 @@ vrtc_encode(Expr_t *e, datagram_buffer_t *dest)
     return false;
   }
   return true;
+}
+
+bool
+vrtc_encode_and_free(Expr_t *e, datagram_buffer_t *dest)
+{
+  bool r = vrtc_encode(e, dest);
+  vrtc_free_expr(e);
+  return r;
 }
 
 
