@@ -56,8 +56,8 @@ vrtcd_handle_expr(Expr_t *e, datagram_buffer_t *dgbuf)
 
   if (!msg_is_call(e), &invocation_id, &opcode_and_args){
   unrecognized_msg:
-    vrtc_encode_and_free(vrtc_make_reject2(vrtc_EC_UNRECOGNIZED_MSG,
-					   vrtc_clone(e)),
+    expr_encode_and_free(vrtc_make_reject2(vrtc_EC_UNRECOGNIZED_MSG,
+					   expr_clone(e)),
 			 dgbuf);
     return;
   }
@@ -85,17 +85,17 @@ vrtcd_handle_incoming_datagram(void *buf, size_t len,
   const unsigned char *payload = (unsigned char *) buf;
   while (len != 0){
     Expr_t *e = 0;
-    vrtc_dec_rval_t rval = vrtc_decode(&e, payload, len);
+    expr_dec_rval_t rval = expr_decode(&e, payload, len);
     if (rval.code == RC_OK){
       // vrtcd_handle_expr(e, &dgbuf);
-      vrtc_free_expr(e);
+      expr_free(e);
       assert(rval.consumed <= len);
       payload += rval.consumed;
       len -= rval.consumed;
     }
     else {
       /* Something's hosed with the payload.  Send a REJECT */
-      vrtc_encode_and_free(vrtc_make_reject(vrtc_EC_CANT_DECODE), &dgbuf);
+      expr_encode_and_free(vrtc_make_reject(vrtc_EC_CANT_DECODE), &dgbuf);
       break;
     }
   }

@@ -11,13 +11,13 @@ _alloc_expr(void)
 }
 
 void
-vrtc_free_expr(Expr_t *p)
+expr_free(Expr_t *p)
 {
   ASN_STRUCT_FREE(asn_DEF_Expr, p);
 }
 
 Expr_t *
-vrtc_make_null(void)
+expr_make_null(void)
 {
   Expr_t *expr = _alloc_expr();
   if (!expr)
@@ -27,7 +27,7 @@ vrtc_make_null(void)
 }
 
 Expr_t *
-vrtc_make_bool(bool v)
+expr_make_bool(bool v)
 {
   Expr_t *expr = _alloc_expr();
   if (!expr)
@@ -38,7 +38,7 @@ vrtc_make_bool(bool v)
 }
 
 Expr_t *
-vrtc_make_int(int v)
+expr_make_int(int v)
 {
   Expr_t *expr = _alloc_expr();
   if (!expr)
@@ -49,26 +49,26 @@ vrtc_make_int(int v)
 }
 
 Expr_t *
-vrtc_make_string(const char *p, size_t len)
+expr_make_string(const char *p, size_t len)
 {
   Expr_t *expr = _alloc_expr();
   if (!expr)
     return 0;
   expr->present = Expr_PR_string;
   if (OCTET_STRING_fromBuf(&expr->choice.string, p, len) == -1){
-    vrtc_free_expr(expr);
+    expr_free(expr);
     return 0;
   }
   return expr;
 }
 
 Expr_t *
-vrtc_make_cstring(const char *p)
+expr_make_cstring(const char *p)
 {
   size_t len = 0;
   if (p)
     len = strlen(p);
-  return vrtc_make_string(p, len);
+  return expr_make_string(p, len);
 }
 
 Expr_t *
@@ -88,17 +88,17 @@ vrtc_seq_add(Expr_t *seq, Expr_t *element)
 }
 
 Expr_t *
-vrtc_make_seq0(void)
+expr_make_seq0(void)
 {
   return vrtc_make_seq();
 }
 
 Expr_t *
-vrtc_make_seq1(Expr_t *x0)
+expr_make_seq1(Expr_t *x0)
 {
   if (x0 == 0){
   free_and_fail:
-    vrtc_free_expr(x0);
+    expr_free(x0);
     return 0;
   }
 
@@ -109,17 +109,17 @@ vrtc_make_seq1(Expr_t *x0)
   if (vrtc_seq_add(seq, x0))
     return seq;
 
-  vrtc_free_expr(seq);	// free seq and contents
+  expr_free(seq);	// free seq and contents
   return 0;
 }
 
 Expr_t *
-vrtc_make_seq2(Expr_t *x0, Expr_t *x1)
+expr_make_seq2(Expr_t *x0, Expr_t *x1)
 {
   if (x0 == 0 || x1 == 0){
   free_and_fail:
-    vrtc_free_expr(x0);
-    vrtc_free_expr(x1);
+    expr_free(x0);
+    expr_free(x1);
     return 0;
   }
 
@@ -130,18 +130,18 @@ vrtc_make_seq2(Expr_t *x0, Expr_t *x1)
   if (vrtc_seq_add(seq, x0) && vrtc_seq_add(seq, x1))
     return seq;
 
-  vrtc_free_expr(seq);	// free seq and contents
+  expr_free(seq);	// free seq and contents
   return 0;
 }
 
 Expr_t *
-vrtc_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2)
+expr_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2)
 {
   if (x0 == 0 || x1 == 0 || x2 == 0){
   free_and_fail:
-    vrtc_free_expr(x0);
-    vrtc_free_expr(x1);
-    vrtc_free_expr(x2);
+    expr_free(x0);
+    expr_free(x1);
+    expr_free(x2);
     return 0;
   }
 
@@ -152,19 +152,19 @@ vrtc_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2)
   if (vrtc_seq_add(seq, x0) && vrtc_seq_add(seq, x1) && vrtc_seq_add(seq, x2))
     return seq;
 
-  vrtc_free_expr(seq);	// free seq and contents
+  expr_free(seq);	// free seq and contents
   return 0;
 }
 
 Expr_t *
-vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
+expr_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
 {
   if (x0 == 0 || x1 == 0 || x2 == 0 || x3 == 0){
   free_and_fail:
-    vrtc_free_expr(x0);
-    vrtc_free_expr(x1);
-    vrtc_free_expr(x2);
-    vrtc_free_expr(x3);
+    expr_free(x0);
+    expr_free(x1);
+    expr_free(x2);
+    expr_free(x3);
     return 0;
   }
 
@@ -176,16 +176,16 @@ vrtc_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
       && vrtc_seq_add(seq, x2) && vrtc_seq_add(seq, x3))
     return seq;
 
-  vrtc_free_expr(seq);	// free seq and contents
+  expr_free(seq);	// free seq and contents
   return 0;
 }
 
 
 Expr_t *
-vrtc_clone(Expr_t *x)
+expr_clone(Expr_t *x)
 {
   // FIXME decode(encode(x)) or equivalent
-  return vrtc_make_int(99999);
+  return expr_make_int(99999);
 }
 
 static int 
@@ -196,7 +196,7 @@ der_encoder_write_shim(const void *buf, size_t size, void *app_key)
 }
 
 bool
-vrtc_encode(Expr_t *e, datagram_buffer_t *dest)
+expr_encode(Expr_t *e, datagram_buffer_t *dest)
 {
   asn_enc_rval_t rval;
 
@@ -220,20 +220,20 @@ vrtc_encode(Expr_t *e, datagram_buffer_t *dest)
 }
 
 bool
-vrtc_encode_and_free(Expr_t *e, datagram_buffer_t *dest)
+expr_encode_and_free(Expr_t *e, datagram_buffer_t *dest)
 {
-  bool r = vrtc_encode(e, dest);
-  vrtc_free_expr(e);
+  bool r = expr_encode(e, dest);
+  expr_free(e);
   return r;
 }
 
 
-vrtc_dec_rval_t
-vrtc_decode(Expr_t **e,
+expr_dec_rval_t
+expr_decode(Expr_t **e,
 	    const void *buffer,
 	    size_t size)
 {
-  vrtc_dec_rval_t rval;
+  expr_dec_rval_t rval;
   rval = ber_decode(0, &asn_DEF_Expr, (void **)e, buffer, size);
   return rval;
 }

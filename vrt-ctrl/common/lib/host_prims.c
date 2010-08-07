@@ -24,8 +24,8 @@
 static Expr_t *
 _vrtc_make_call(int invocation_id, Expr_t *opcode_and_args)
 {
-  return vrtc_make_seq3(vrtc_make_int(vrtc_CALL),
-			vrtc_make_int(invocation_id),
+  return expr_make_seq3(expr_make_int(vrtc_CALL),
+			expr_make_int(invocation_id),
 			opcode_and_args);
 }
 
@@ -33,8 +33,8 @@ static Expr_t *
 _vrtc_make_get_helper(int invocation_id, const char *path, int opcode)
 {
   return _vrtc_make_call(invocation_id, 
-			 vrtc_make_seq2(vrtc_make_int(opcode),
-					vrtc_make_cstring(path)));
+			 expr_make_seq2(expr_make_int(opcode),
+					expr_make_cstring(path)));
 }
 
 Expr_t *
@@ -53,7 +53,7 @@ Expr_t *
 vrtc_make_put(int invocation_id, const char *path, Expr_t *v)
 {
   return _vrtc_make_call(invocation_id, 
-			 vrtc_make_seq3(vrtc_make_int(vrtc_PUT),
-					vrtc_make_cstring(path),
+			 expr_make_seq3(expr_make_int(vrtc_PUT),
+					expr_make_cstring(path),
 					v));
 }

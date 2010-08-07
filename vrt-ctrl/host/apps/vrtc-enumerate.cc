@@ -56,7 +56,7 @@ class expr_connection : public vrtc::udp_connection
     // Decode all Expr's in payload.
     // Call d_expr_handler for each one
 
-    vrtc_dec_rval_t	rval;
+    expr_dec_rval_t	rval;
     const unsigned char *payload = (unsigned char *) vpayload;
     boost::system::error_code ok;
 
@@ -64,10 +64,10 @@ class expr_connection : public vrtc::udp_connection
 
     while (len != 0){
       Expr_t *e = 0;
-      rval = vrtc_decode(&e, payload, len);
+      rval = expr_decode(&e, payload, len);
       if (rval.code == RC_OK){
 	d_expr_handler(ok, e);
-	vrtc_free_expr(e);
+	expr_free(e);
 	assert(rval.consumed <= len);
 	payload += rval.consumed;
 	len -= rval.consumed;
@@ -119,7 +119,7 @@ public:
   //! Encode expr and insert in outgoing datagram
   bool encode_and_enqueue(Expr_t *e)
   {
-    return vrtc_encode(e, &d_datagram_buffer);
+    return expr_encode(e, &d_datagram_buffer);
   }
 
   //! Encode expr, insert in outgoing datagram, and send it on its way
@@ -176,7 +176,7 @@ public:
   {
     Expr_t *e = vrtc_make_get(alloc_inv_id(), "/");
     d_conn.encode_and_flush(e);
-    vrtc_free_expr(e);
+    expr_free(e);
   }
 
   void

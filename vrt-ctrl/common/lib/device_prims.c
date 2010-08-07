@@ -24,30 +24,30 @@
 Expr_t *
 vrtc_make_reply(int invocation_id, Expr_t *v)
 {
-  return vrtc_make_seq3(vrtc_make_int(vrtc_REPLY),
-			vrtc_make_int(invocation_id),
+  return expr_make_seq3(expr_make_int(vrtc_REPLY),
+			expr_make_int(invocation_id),
 			v);
 }
 
 Expr_t *
 vrtc_make_error(int invocation_id, int error_code, Expr_t *error_arg)
 {
-  return vrtc_make_seq3(vrtc_make_int(vrtc_ERROR),
-			vrtc_make_int(invocation_id),
+  return expr_make_seq3(expr_make_int(vrtc_ERROR),
+			expr_make_int(invocation_id),
 			vrtc_make_error_info2(error_code, error_arg));
 }
 
 Expr_t *
 vrtc_make_reject(int error_code)
 {
-  return vrtc_make_seq2(vrtc_make_int(vrtc_REJECT),
+  return expr_make_seq2(expr_make_int(vrtc_REJECT),
 			vrtc_make_error_info(error_code));
 }
 
 Expr_t *
 vrtc_make_reject2(int error_code, Expr_t *error_arg)
 {
-  return vrtc_make_seq2(vrtc_make_int(vrtc_REJECT),
+  return expr_make_seq2(expr_make_int(vrtc_REJECT),
 			vrtc_make_error_info2(error_code, error_arg));
 }
 
@@ -55,20 +55,20 @@ vrtc_make_reject2(int error_code, Expr_t *error_arg)
 Expr_t *
 vrtc_make_note(int note_kind, Expr_t *note_arg)
 {
-  return vrtc_make_seq3(vrtc_make_int(vrtc_NOTE),
-			vrtc_make_int(note_kind),
+  return expr_make_seq3(expr_make_int(vrtc_NOTE),
+			expr_make_int(note_kind),
 			note_arg);
 }
 
 Expr_t *
 vrtc_make_error_info(int error_code)
 {
-   return vrtc_make_error_info2(error_code, vrtc_make_null());
+   return vrtc_make_error_info2(error_code, expr_make_null());
 }
 
 Expr_t *
 vrtc_make_error_info2(int error_code, Expr_t *error_arg)
 {
-  return vrtc_make_seq2(vrtc_make_int(error_code), error_arg);
+  return expr_make_seq2(expr_make_int(error_code), error_arg);
 }
 
