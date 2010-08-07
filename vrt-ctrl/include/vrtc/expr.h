@@ -30,11 +30,7 @@ extern "C" {
 #include <vrtc/asn1c/Expr.h>
 #include <vrtc/datagram_buffer.h>
 
-/*! 
- * \brief Free Expr_t \p p and any contained elements 
- * If \p is 0, nothing is done.
- */
-void expr_free(Expr_t *p);
+  /* ----- Constructors ----- */
 
 /*! \returns a "null" expr if successful, else 0. */
 Expr_t *expr_make_null(void);
@@ -43,7 +39,7 @@ Expr_t *expr_make_null(void);
 Expr_t * expr_make_bool(bool v);
 
 /*! \returns a "integer" expr if successful, else 0. */
-Expr_t * expr_make_int(int v);
+Expr_t * expr_make_int(long v);
 
 /*! 
  * \returns a "string" expr if successful, else 0.
@@ -85,10 +81,73 @@ Expr_t *expr_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2);
  */
 Expr_t *expr_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3);
 
+  /* ----- Predicates ----- */
+
+  static inline bool expr_is_seq(Expr_t *x) { return x->present == Expr_PR_seq; }
+  static inline bool expr_is_null(Expr_t *x) { return x->present == Expr_PR_null; }
+  static inline bool expr_is_bool(Expr_t *x) { return x->present == Expr_PR_boolean; }
+  static inline bool expr_is_int(Expr_t *x) { return x->present == Expr_PR_integer; }
+  static inline bool expr_is_string(Expr_t *x) { return x->present == Expr_PR_string; }
+  static inline bool expr_is_float(Expr_t *x) { return x->present == Expr_PR_ieee_float; }  
+  static inline bool expr_is_complex_int(Expr_t *x) { return x->present == Expr_PR_complex_int; }
+  static inline bool expr_is_complex_float(Expr_t *x) { return x->present == Expr_PR_complex_float; }
+
+  /* ----- Accessors ----- */
+
+  /* Caller MUST confirm type using predicate before applying accessor */
+
+  static inline unsigned int
+  expr_seq_len(Expr_t *x)
+  {
+    return x->choice.seq.list.count;
+  }
+
+  static inline Expr_t *
+  expr_seq_ref(Expr_t *x, size_t index)
+  {
+    return x->choice.seq.list.array[index];
+  }
+
+  static inline bool
+  expr_get_bool(Expr_t *x)
+  {
+    return x->choice.boolean;
+  }
+
+  static inline long
+  expr_get_int(Expr_t *x)
+  {
+    return x->choice.integer;
+  }
+
+  static inline unsigned int
+  expr_string_len(Expr_t *x)
+  {
+    return x->choice.string.size;
+  }
+
+  static inline unsigned char *
+  expr_string_ptr(Expr_t *x)
+  {
+    return x->choice.string.buf;
+  }
+
+  /* ----- Misc ----- */
+
+/*! 
+ * \brief Free Expr_t \p p and any contained elements 
+ * If \p is 0, nothing is done.
+ */
+void expr_free(Expr_t *p);
+
+
 /*!
  * \brief Return a copy of x iff successful, else 0.
  */
 Expr_t *expr_clone(Expr_t *x);
+
+/* print a representation of \x to stdout */
+void expr_print(Expr_t *x);
 
 /*
  * -------------------------------------------------------------------------

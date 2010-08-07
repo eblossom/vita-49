@@ -27,6 +27,7 @@ libvrtc_common_la_SOURCES = \
 	datagram_buffer.c \
 	device_prims.c \
 	expr.c \
+	expr_print.c \
 	host_prims.c
 
 libvrtc_common_la_LIBADD = \

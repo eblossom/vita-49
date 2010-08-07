@@ -24,6 +24,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 lib_LTLIBRARIES = libvrtc-device.la
 
 libvrtc_device_la_SOURCES = \
+	handle_op.c \
 	vrtcd_handle_incoming_datagram.c
 
 libvrtc_device_la_LIBADD = \

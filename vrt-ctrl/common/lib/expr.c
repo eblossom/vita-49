@@ -38,7 +38,7 @@ expr_make_bool(bool v)
 }
 
 Expr_t *
-expr_make_int(int v)
+expr_make_int(long v)
 {
   Expr_t *expr = _alloc_expr();
   if (!expr)

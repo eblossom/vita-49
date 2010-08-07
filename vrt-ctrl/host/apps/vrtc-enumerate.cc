@@ -28,7 +28,7 @@ class expr_connection : public vrtc::udp_connection
   char 			d_tx_data[MAX_PAYLOAD];
   datagram_buffer_t	d_datagram_buffer;	// buffers partially constructed datagram
   boost::function<
-    void (const boost::system::error_code &error, const Expr_t *expr)> d_expr_handler;
+    void (const boost::system::error_code &error, /*const*/ Expr_t *expr)> d_expr_handler;
   
   void handle_rcvd_payload(const boost::system::error_code &error,
 			   std::size_t bytes_transferred)
@@ -60,7 +60,7 @@ class expr_connection : public vrtc::udp_connection
     const unsigned char *payload = (unsigned char *) vpayload;
     boost::system::error_code ok;
 
-    print_hex(stdout, payload, len);
+    // print_hex(stdout, payload, len);
 
     while (len != 0){
       Expr_t *e = 0;
@@ -180,7 +180,7 @@ public:
   }
 
   void
-  handle_rcvd_expr(const boost::system::error_code &error, const Expr_t *e)
+  handle_rcvd_expr(const boost::system::error_code &error, Expr_t *e)
   {
     if (error){
       std::cerr << "handle_rcvd_expr: error: " 
@@ -189,7 +189,10 @@ public:
       return;
     }
 
-    asn_fprint(stdout, &asn_DEF_Expr, e); 	// FIXME better printer
+    //asn_fprint(stdout, &asn_DEF_Expr, e); 	// FIXME better printer
+    expr_print(e);
+    std::cout << std::endl;
+
     send_packet();
   }
 };
