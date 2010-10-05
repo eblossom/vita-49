@@ -1,9 +1,0 @@
-/Makefile
-/Makefile.in
-/.libs
-/.deps
-/usrp2.py
-/usrp2.cc
-/run_tests
-/test_gr_usrp2
-/*.pyc

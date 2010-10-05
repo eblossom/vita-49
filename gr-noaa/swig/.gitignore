@@ -1,6 +1,0 @@
-Makefile
-Makefile.in
-.deps
-.libs
-noaa_swig.cc
-noaa_swig.py
