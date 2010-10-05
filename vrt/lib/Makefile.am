@@ -17,11 +17,7 @@
 
 include $(top_srcdir)/Makefile.common
 
-AM_CPPFLAGS = \
-    $(VRT_INCLUDES) \
-    $(BOOST_CPPFLAGS) \
-    $(CPPUNIT_INCLUDES) \
-    $(GRUEL_INCLUDES)
+AM_CPPFLAGS = -I$(top_srcdir)/include
 
 bin_PROGRAMS = 
 

@@ -22,8 +22,25 @@ include $(top_srcdir)/Makefile.common
 
 # List your m4 macros here
 m4macros = \
+	acx_pthread.m4 \
+	ax_boost_base.m4 \
+	ax_boost_date_time.m4 \
+	ax_boost_filesystem.m4 \
+	ax_boost_iostreams.m4 \
+	ax_boost_program_options.m4 \
+	ax_boost_python.m4 \
+	ax_boost_regex.m4 \
+	ax_boost_serialization.m4 \
+	ax_boost_signals.m4 \
+	ax_boost_system.m4 \
+	ax_boost_test_exec_monitor.m4 \
+	ax_boost_thread.m4 \
+	ax_boost_unit_test_framework.m4 \
+	ax_boost_wserialization.m4 \
+	gr_git.m4 \
 	gr_lib64.m4 \
 	gr_no_undefined.m4 \
+	gr_version.m4 \
 	lf_cc.m4 \
 	lf_cxx.m4 \
 	lf_warnings.m4

@@ -18,7 +18,7 @@ dnl
 AC_INIT
 AC_PREREQ(2.61)
 AM_CONFIG_HEADER(config.h)
-AC_CONFIG_SRCDIR([include/vrt/expaned_if_context_section.h])
+AC_CONFIG_SRCDIR([include/vrt/expanded_if_context_section.h])
 
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
@@ -39,6 +39,11 @@ fi
 LF_CONFIGURE_CC
 LF_CONFIGURE_CXX
 GR_LIB64		dnl check for lib64 suffix after choosing compilers
+
+GR_VERSION
+
+dnl define WORDS_BIGENDIAN if needed
+AC_C_BIGENDIAN
 
 
 dnl The three macros above are known to override CFLAGS if the user
