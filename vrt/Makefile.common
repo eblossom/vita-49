@@ -1,0 +1,42 @@
+# -*- Makefile -*-
+#
+# Copyright 2010 Free Software Foundation, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+AM_CFLAGS = @autoconf_default_CFLAGS@ @lf_CFLAGS@
+AM_CXXFLAGS = @autoconf_default_CXXFLAGS@ @lf_CXXFLAGS@
+
+# Sets ABI version in SONAME and appends -LIBVER to filename
+LTVERSIONFLAGS = -version-info 0:0:0 -release $(LIBVER)
+
+# Fix for BSD make not defining $(RM).  We define it now in configure.ac
+# using AM_PATH_PROG, but now here have to add a -f to be like GNU make
+RM=$(RM_PROG) -f
+
+# Base directory for documentation (docdir undefined in autoconf < 1.60)
+docdir ?= $(datadir)/doc/$(PACKAGE)
+gr_docdir = $(docdir)-$(DOCVER)
+
+# Other common defines; use "+=" to add to these
+STAMPS =
+MOSTLYCLEANFILES = $(BUILT_SOURCES) $(STAMPS) *.pyc *.pyo *~ *.tmp *.loT
+
+# Don't distribute the files defined in the variable 'no_dist_files'
+dist-hook:
+	@for file in $(no_dist_files); do \
+		echo $(RM) $(distdir)/$$file; \
+		$(RM) $(distdir)/$$file; \
+	done;
