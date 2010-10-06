@@ -25,7 +25,7 @@ AC_DEFUN([GR_GIT],[
   dnl If it exists, get either 'git describe' or fallback to current commit
   if test x$GIT != x ; then
     AC_MSG_CHECKING([existence of git version control directory])
-    if test -d $srcdir/.git ; then
+    if test -d $srcdir/../.git; then
       AC_MSG_RESULT([ok])
       AC_MSG_CHECKING([git description of current commit])
       if (cd $srcdir && $GIT describe >/dev/null 2>&1); then

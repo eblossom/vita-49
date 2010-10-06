@@ -24,7 +24,11 @@ AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(vrt,0.0)
+GR_VERSION
+dnl ustar required to have pathnames > 99 chars
+_AM_SET_OPTION([tar-ustar])
+dnl AM_INIT_AUTOMAKE(vrt,$RELEASE)
+AM_INIT_AUTOMAKE(vrt,1.0.0)
 
 dnl Remember if the user explicity set CFLAGS
 if test -n "${CFLAGS}"; then
@@ -39,8 +43,6 @@ fi
 LF_CONFIGURE_CC
 LF_CONFIGURE_CXX
 GR_LIB64		dnl check for lib64 suffix after choosing compilers
-
-GR_VERSION
 
 dnl define WORDS_BIGENDIAN if needed
 AC_C_BIGENDIAN

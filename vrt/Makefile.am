@@ -24,6 +24,7 @@ pkgconfig_DATA = vrt.pc
 
 EXTRA_DIST = \
 	bootstrap \
-	vrt.pc.in        
+	version.sh \
+	vrt.pc.in
 
-SUBDIRS = include lib apps
+SUBDIRS = m4 include lib apps
