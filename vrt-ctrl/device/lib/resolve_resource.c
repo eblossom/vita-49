@@ -59,12 +59,16 @@ dir_seq(Expr_t *e)
 }
 
 static Expr_t *
-get_children_path_terms(vrtd_node_t *node)
+get_childrens_path_terms(vrtd_node_t *node)
 {
-  vrtd_node_t	*p = node->u.dir.first_child;
-  return expr_make_seq0();	// FIXME
-}
+  Expr_t	*seq = expr_make_seq();
+  vrtd_node_t 	*p;
 
+  for (p = node->u.dir.first_child; p; p = p->sibling){
+    seq = expr_seq_add_element(seq, expr_make_cstring(p->path_term));
+  }
+  return seq;
+}
 
 static void
 apply_op(op_info_t *oi, vrtd_traversal_info_t *ti, vrtd_node_t *node)
@@ -73,7 +77,7 @@ apply_op(op_info_t *oi, vrtd_traversal_info_t *ti, vrtd_node_t *node)
     switch(oi->op_code){
     case opGET:
     case opGET_META:
-      send_reply(oi, dir_seq(get_children_path_terms(node)));
+      send_reply(oi, dir_seq(get_childrens_path_terms(node)));
       return;
 
     case opPUT:
@@ -133,7 +137,6 @@ resolve_resource(op_info_t *oi)
   memset(&ti, 0, sizeof(ti));
 
   char *vpath[MAX_PATH_TERMS];
-  printf("sizeof(vpath) = %zd\n", sizeof(vpath));
   memset(vpath, 0, sizeof(vpath));
   ti.path = oi->path;
   ti.vpath = vpath;
