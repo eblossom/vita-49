@@ -152,6 +152,7 @@ extern "C" {
 
 class control {
   expr_connection d_conn;
+  int		  d_inv_id;
 
 public:
   control(boost::asio::io_service &io_service,
@@ -163,7 +164,7 @@ public:
 
   int alloc_inv_id()
   {
-    return 0;	// FIXME
+    return d_inv_id++;	// FIXME
   }
 
   void free_inv_id(int inv_id)
