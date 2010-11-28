@@ -108,7 +108,7 @@
 
 <opcode-and-args> ::= { <GET>  <path> }
                     | { <GET-META> <path> }
-                    | { <PUT> <path> <expr> }
+                    | { <PUT> <path> <expr> <when> }
                     ;
 
 <error-info> ::= { <error-code> <error-arg> } ;
@@ -151,6 +151,27 @@
 <metadata-value> := <expr> ;
 
 <sequence-of-metadata> ::= { <metadata>* } ;    // seq of zero or more <metadata>
+
+
+// Specify the absolute time at which to execute a <PUT>.
+//
+//   <null> means as soon as possible.
+//   <vrt-time> means at the specified time.
+//
+// Note that not all resources honor <when>.
+// The metadata associated with the resource indicates if the resource
+// honors <when>.  FIXME details.
+//
+
+<when> ::= <null>
+         | <vrt-time>
+	 ;
+
+<vrt-time> ::= { <int-seconds> <frac-seconds-hi> <frac-seconds-lo> } ;
+
+<int-seconds> := <integer> ;	  // VRT Integer Seconds field
+<frac-seconds-hi> := <integer> ;  // hi 32-bits of VRT Fractional Seconds field
+<frac-seconds-lo> := <integer> ;  // lo 32-bits of VRT Fractional Seconds field
 
 
 // ----------------------------------------------------------------
@@ -277,13 +298,16 @@ Host            Device
 // <PUT> applied to a directory resource (non-leaf) returns <ERROR>
 // with <error-code> == EC_CANT_PUT_DIRECTORY
 //
-// <PUT> applied to a leaf resource sets <expr> as the value of that resource.
+// <PUT> applied to a resource sets the value of that resource to <expr1>.
+//
+// The value returned, <expr2>, shall be #t or another value determined
+// by the resource.
 //
 // <ERROR> is returned if the <path> doesn't exist, is a directory,
 // isn't puttable, <expr> is of the wrong type, etc.
 
-{ <CALL> <invocation-id> { <PUT> <path> <expr>} } ==>
+{ <CALL> <invocation-id> { <PUT> <path> <expr1> <when>} } ==>
 
-                { <REPLY> <invocation-id> #t }
+                { <REPLY> <invocation-id> { <LEAF> <expr2> } }
               | { <ERROR> <invocation-id> <error-info> }
 
