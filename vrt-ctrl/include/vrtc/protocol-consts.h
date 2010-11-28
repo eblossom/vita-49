@@ -30,11 +30,22 @@
 #define	vrtc_GET_META	1
 #define vrtc_PUT	2
 
+#define vrtc_LEAF	3
+#define vrtc_DIR	4
+
 /* error-codes */
 
 #define	vrtc_EC_CANT_DECODE		1
 #define	vrtc_EC_UNRECOGNIZED_MSG	2
 #define	vrtc_EC_NOT_IMPLEMENTED		3
+#define vrtc_EC_PATH_TOO_LONG		4
+#define vrtc_EC_PATH_TOO_DEEP		5
+#define vrtc_EC_INVALID_PATH		6
+#define vrtc_EC_NO_ENTRY		7
+#define vrtc_EC_NOT_PUTTABLE		8
+#define vrtc_EC_NOT_GETTABLE		9
+#define vrtc_EC_INTERNAL_ERROR	       10
+
 
 /* note-kind constants */
 
