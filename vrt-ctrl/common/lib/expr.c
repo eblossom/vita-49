@@ -90,8 +90,9 @@ vrtc_seq_add(Expr_t *seq, Expr_t *element)
 Expr_t *
 expr_seq_add_element(Expr_t *seq, Expr_t *element)
 {
-  if (element == 0){
+  if (seq == 0 || element == 0){
     expr_free(seq);
+    expr_free(element);
     return 0;
   }
 
@@ -113,90 +114,40 @@ expr_make_seq0(void)
 Expr_t *
 expr_make_seq1(Expr_t *x0)
 {
-  if (x0 == 0){
-  free_and_fail:
-    expr_free(x0);
-    return 0;
-  }
-
   Expr_t *seq = vrtc_make_seq();
-  if (seq == 0)
-    goto free_and_fail;
-    
-  if (vrtc_seq_add(seq, x0))
-    return seq;
-
-  expr_free(seq);	// free seq and contents
-  return 0;
+  seq = expr_seq_add_element(seq, x0);
+  return seq;
 }
 
 Expr_t *
 expr_make_seq2(Expr_t *x0, Expr_t *x1)
 {
-  if (x0 == 0 || x1 == 0){
-  free_and_fail:
-    expr_free(x0);
-    expr_free(x1);
-    return 0;
-  }
-
   Expr_t *seq = vrtc_make_seq();
-  if (seq == 0)
-    goto free_and_fail;
-
-  if (vrtc_seq_add(seq, x0) && vrtc_seq_add(seq, x1))
-    return seq;
-
-  expr_free(seq);	// free seq and contents
-  return 0;
+  seq = expr_seq_add_element(seq, x0);
+  seq = expr_seq_add_element(seq, x1);
+  return seq;
 }
 
 Expr_t *
 expr_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2)
 {
-  if (x0 == 0 || x1 == 0 || x2 == 0){
-  free_and_fail:
-    expr_free(x0);
-    expr_free(x1);
-    expr_free(x2);
-    return 0;
-  }
-
   Expr_t *seq = vrtc_make_seq();
-  if (seq == 0)
-    goto free_and_fail;
-
-  if (vrtc_seq_add(seq, x0) && vrtc_seq_add(seq, x1) && vrtc_seq_add(seq, x2))
-    return seq;
-
-  expr_free(seq);	// free seq and contents
-  return 0;
+  seq = expr_seq_add_element(seq, x0);
+  seq = expr_seq_add_element(seq, x1);
+  seq = expr_seq_add_element(seq, x2);
+  return seq;
 }
 
 Expr_t *
 expr_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
 {
-  if (x0 == 0 || x1 == 0 || x2 == 0 || x3 == 0){
-  free_and_fail:
-    expr_free(x0);
-    expr_free(x1);
-    expr_free(x2);
-    expr_free(x3);
-    return 0;
-  }
-
   Expr_t *seq = vrtc_make_seq();
-  if (seq == 0)
-    goto free_and_fail;
-
-  if (vrtc_seq_add(seq, x0) && vrtc_seq_add(seq, x1)
-      && vrtc_seq_add(seq, x2) && vrtc_seq_add(seq, x3))
-    return seq;
-
-  expr_free(seq);	// free seq and contents
-  return 0;
+  seq = expr_seq_add_element(seq, x0);
+  seq = expr_seq_add_element(seq, x1);
+  seq = expr_seq_add_element(seq, x2);
+  seq = expr_seq_add_element(seq, x3);
+  return seq;
 }
-
 
 Expr_t *
 expr_clone(Expr_t *x)
