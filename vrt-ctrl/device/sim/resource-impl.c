@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "resource-implementations.h"
+#include "resource-impl.h"
 #include <vrtc/protocol-consts.h>
 #include <vrtc/device_prims.h>
 

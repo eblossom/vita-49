@@ -42,7 +42,7 @@
  * /rf-in/{0,1,2,3}/temp		r
  */
 
-#include "resource-implementations.h"
+#include "resource-impl.h"
 
 extern vrtd_node_t root_node;
 extern vrtd_node_t freq_node;
