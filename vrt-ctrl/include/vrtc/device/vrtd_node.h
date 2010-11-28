@@ -28,6 +28,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <vrtc/expr.h>
 
 
 struct vrtd_node;
@@ -55,9 +56,8 @@ typedef struct {
  *  | { <LEAF> <expr> }
  * </pre>
  */
-typedef Expr_t* (*)(vrtd_node_t *self,
-		    vrtd_traversal_info_t *
-		    ) vrtcd_op_get_t;
+typedef Expr_t *(*vrtcd_op_get_t)(vrtd_node_t *self,
+				  vrtd_traversal_info_t *);
 
 /*!
  * \brief The function type called to implement a GET-META on a leaf.
@@ -68,10 +68,8 @@ typedef Expr_t* (*)(vrtd_node_t *self,
  *  | { <LEAF> <sequence-of-metadata> }
  * </pre>
  */
-typedef Expr_t* (*)(vrtd_node_t *self,
-		    vrtd_traversal_info_t *,
-		    Expr_t *value
-		    ) vrtcd_op_get_meta_t;
+typedef Expr_t *(*vrtcd_op_get_meta_t)(vrtd_node_t *self,
+				       vrtd_traversal_info_t *);
 
 /*!
  * \brief The function type called to implement a PUT on a leaf.
@@ -82,17 +80,15 @@ typedef Expr_t* (*)(vrtd_node_t *self,
  *  | { <LEAF> <expr> }
  * </pre>
  */
-typedef Expr_t* (*)(vrtd_node_t *self,
-		    vrtd_traversal_info_t *,
-		    Expr_t *value,
-		    Expr_t *when
-		    ) vrtcd_op_put_t;
+typedef Expr_t *(*vrtcd_op_put_t)(vrtd_node_t *self,
+				  vrtd_traversal_info_t *,
+				  Expr_t *value,
+				  Expr_t *when);
 
 
-// Node type:
 struct vrtd_node
 {
-  const char	       	*my_path_term;
+  const char	       	*path_term;
   int32_t		numeric_path_value;	// valid if NF_NUMERIC in flags
   struct vrtd_node	*sibling;
   uint16_t		flags;

@@ -34,6 +34,7 @@
 
 #define	vrtc_EC_CANT_DECODE		1
 #define	vrtc_EC_UNRECOGNIZED_MSG	2
+#define	vrtc_EC_NOT_IMPLEMENTED		3
 
 /* note-kind constants */
 

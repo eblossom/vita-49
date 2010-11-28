@@ -24,8 +24,14 @@ AM_CXXFLAGS += $(BOOST_CXXFLAGS)
 
 bin_PROGRAMS = vrtc-dev-sim
 
-vrtc_dev_sim_SOURCES = dev-sim-main.cc
-vrtc_dev_sim_LDADD = ../lib/libvrtc-device.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
+vrtc_dev_sim_SOURCES = \
+	dev-sim-main.cc \
+	resource-implementations.c \
+	resource-tree.c
+
+vrtc_dev_sim_LDADD = \
+	../lib/libvrtc-device.la \
+	$(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
 
 #vrtc_dev_sim_echo_raw_SOURCES = dev-sim-main.cc handle_datagram_echo_raw.c
 #vrtc_dev_sim_echo_raw_LDADD = ../lib/libvrtc-device.la $(BOOST_LDFLAGS) $(BOOST_SYSTEM_LIB)
