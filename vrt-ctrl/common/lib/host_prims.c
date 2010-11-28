@@ -50,10 +50,11 @@ vrtc_make_get_meta(int invocation_id, const char *path)
 }
 
 Expr_t *
-vrtc_make_put(int invocation_id, const char *path, Expr_t *v)
+vrtc_make_put(int invocation_id, const char *path, Expr_t *v, Expr_t *when)
 {
   return _vrtc_make_call(invocation_id, 
-			 expr_make_seq3(expr_make_int(vrtc_PUT),
+			 expr_make_seq4(expr_make_int(vrtc_PUT),
 					expr_make_cstring(path),
-					v));
+					v,
+					when));
 }

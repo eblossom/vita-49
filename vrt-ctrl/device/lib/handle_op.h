@@ -31,6 +31,7 @@ void handle_get(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path);
 void handle_get_meta(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path);
 
 /* path is known to be a string */
-void handle_put(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path, Expr_t *value);
+void handle_put(datagram_buffer_t *dgbuf,
+		int inv_id, Expr_t *path, Expr_t *value, Expr_t *when);
 
 #endif /* INCLUDED_HANDLE_OP_H */

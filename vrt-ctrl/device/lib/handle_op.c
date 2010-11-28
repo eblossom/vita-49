@@ -53,13 +53,16 @@ handle_get_meta(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path)
 }
 
 void
-handle_put(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path, Expr_t *value)
+handle_put(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path,
+	   Expr_t *value, Expr_t *when)
 {
   if (VERBOSE){
     printf("handle_put: ");
     expr_print(path);
     printf(" ");
     expr_print(value);
+    printf(" ");
+    expr_print(when);
     printf("\n");
   }
 }

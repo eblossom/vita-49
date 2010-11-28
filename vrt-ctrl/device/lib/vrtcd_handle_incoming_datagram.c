@@ -28,7 +28,7 @@
 #include "handle_op.h"
 
 
-#define MAX_PAYLOAD (1500 - 28)	/* Maximum UDP payload on typically ethernet */
+#define MAX_PAYLOAD (1500 - 28)	/* Maximum UDP payload on typical ethernet */
 
 /* 
  * is it: { <CALL> <invocation-id> <opcode-and-args> } 
@@ -40,8 +40,8 @@ msg_is_call(Expr_t *msg, int *inv_id, Expr_t **opcode_and_args)
 	     && expr_is_seq(msg)
 	     && expr_seq_len(msg) == 3
 	     && expr_is_int(expr_seq_ref(msg, 0))
-	     && expr_is_int(expr_seq_ref(msg, 1))
-	     && expr_get_int(expr_seq_ref(msg, 0)) == vrtc_CALL);
+	     && expr_get_int(expr_seq_ref(msg, 0)) == vrtc_CALL
+	     && expr_is_int(expr_seq_ref(msg, 1)));
   if (ok){
     *inv_id = expr_get_int(expr_seq_ref(msg, 1));
     *opcode_and_args = expr_seq_ref(msg, 2);
@@ -58,8 +58,8 @@ static bool op_is_get(Expr_t *opcode_and_args, Expr_t **path)
 	     && expr_is_seq(opcode_and_args)
 	     && expr_seq_len(opcode_and_args) == 2
 	     && expr_is_int(expr_seq_ref(opcode_and_args, 0))
-	     && expr_is_string(expr_seq_ref(opcode_and_args, 1))
-	     && expr_get_int(expr_seq_ref(opcode_and_args, 0)) == vrtc_GET);
+	     && expr_get_int(expr_seq_ref(opcode_and_args, 0)) == vrtc_GET
+	     && expr_is_string(expr_seq_ref(opcode_and_args, 1)));
   if (ok){
     *path = expr_seq_ref(opcode_and_args, 1);
   }
@@ -75,8 +75,8 @@ static bool op_is_get_meta(Expr_t *opcode_and_args, Expr_t **path)
 	     && expr_is_seq(opcode_and_args)
 	     && expr_seq_len(opcode_and_args) == 2
 	     && expr_is_int(expr_seq_ref(opcode_and_args, 0))
-	     && expr_is_string(expr_seq_ref(opcode_and_args, 1))
-	     && expr_get_int(expr_seq_ref(opcode_and_args, 0)) == vrtc_GET_META);
+	     && expr_get_int(expr_seq_ref(opcode_and_args, 0)) == vrtc_GET_META
+	     && expr_is_string(expr_seq_ref(opcode_and_args, 1)));
   if (ok){
     *path = expr_seq_ref(opcode_and_args, 1);
   }
@@ -84,19 +84,38 @@ static bool op_is_get_meta(Expr_t *opcode_and_args, Expr_t **path)
 }
 
 /*
- * is it: { <PUT> <path> <value> }
+ * is it: Null | { <int> <int> <int> }
  */
-static bool op_is_put(Expr_t *opcode_and_args, Expr_t **path, Expr_t **value)
+static bool expr_is_when(Expr_t *e)
+{
+  if (expr_is_null(e))
+    return true;
+
+  bool ok = (true
+	     && expr_is_seq(e)
+	     && expr_seq_len(e) == 3
+	     && expr_is_int(expr_seq_ref(e, 0))
+	     && expr_is_int(expr_seq_ref(e, 1))
+	     && expr_is_int(expr_seq_ref(e, 2)));
+  return ok;
+}
+
+/*
+ * is it: { <PUT> <path> <value> <when> }
+ */
+static bool op_is_put(Expr_t *opcode_and_args, Expr_t **path, Expr_t **value, Expr_t **when)
 {
   bool ok = (true
 	     && expr_is_seq(opcode_and_args)
-	     && expr_seq_len(opcode_and_args) == 3
+	     && expr_seq_len(opcode_and_args) == 4
 	     && expr_is_int(expr_seq_ref(opcode_and_args, 0))
+	     && expr_get_int(expr_seq_ref(opcode_and_args, 0)) == vrtc_PUT
 	     && expr_is_string(expr_seq_ref(opcode_and_args, 1))
-	     && expr_get_int(expr_seq_ref(opcode_and_args, 0)) == vrtc_PUT);
+	     && expr_is_when(expr_seq_ref(opcode_and_args, 3)));
   if (ok){
     *path = expr_seq_ref(opcode_and_args, 1);
     *value = expr_seq_ref(opcode_and_args, 2);
+    *when = expr_seq_ref(opcode_and_args, 3);
   }
   return ok;
 }
@@ -108,6 +127,7 @@ vrtcd_handle_expr(Expr_t *e, datagram_buffer_t *dgbuf)
   Expr_t *opcode_and_args = 0;
   Expr_t *path = 0;
   Expr_t *value = 0;
+  Expr_t *when = 0;
 
   if (!msg_is_call(e, &inv_id, &opcode_and_args)){
   unrecognized_msg:
@@ -121,8 +141,8 @@ vrtcd_handle_expr(Expr_t *e, datagram_buffer_t *dgbuf)
     handle_get(dgbuf, inv_id, path);
   else if (op_is_get_meta(opcode_and_args, &path))
     handle_get_meta(dgbuf, inv_id, path);
-  else if (op_is_put(opcode_and_args, &path, &value))
-    handle_put(dgbuf, inv_id, path, value);
+  else if (op_is_put(opcode_and_args, &path, &value, &when))
+    handle_put(dgbuf, inv_id, path, value, when);
   else
     goto unrecognized_msg;
 }

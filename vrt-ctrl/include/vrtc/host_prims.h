@@ -26,7 +26,7 @@ extern "C" {
 
 Expr_t *vrtc_make_get(int invocation_id, const char *path);
 Expr_t *vrtc_make_get_meta(int invocation_id, const char *path);
-Expr_t *vrtc_make_put(int invocation_id, const char *path, Expr_t *v);
+Expr_t *vrtc_make_put(int invocation_id, const char *path, Expr_t *v, Expr_t *when);
 
 #ifdef __cplusplus
 }
