@@ -72,7 +72,7 @@ expr_make_cstring(const char *p)
 }
 
 Expr_t *
-vrtc_make_seq(void)
+expr_make_seq(void)
 {
   Expr_t *expr = _alloc_expr();
   if (!expr)
@@ -108,13 +108,13 @@ expr_seq_add_element(Expr_t *seq, Expr_t *element)
 Expr_t *
 expr_make_seq0(void)
 {
-  return vrtc_make_seq();
+  return expr_make_seq();
 }
 
 Expr_t *
 expr_make_seq1(Expr_t *x0)
 {
-  Expr_t *seq = vrtc_make_seq();
+  Expr_t *seq = expr_make_seq();
   seq = expr_seq_add_element(seq, x0);
   return seq;
 }
@@ -122,7 +122,7 @@ expr_make_seq1(Expr_t *x0)
 Expr_t *
 expr_make_seq2(Expr_t *x0, Expr_t *x1)
 {
-  Expr_t *seq = vrtc_make_seq();
+  Expr_t *seq = expr_make_seq();
   seq = expr_seq_add_element(seq, x0);
   seq = expr_seq_add_element(seq, x1);
   return seq;
@@ -131,7 +131,7 @@ expr_make_seq2(Expr_t *x0, Expr_t *x1)
 Expr_t *
 expr_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2)
 {
-  Expr_t *seq = vrtc_make_seq();
+  Expr_t *seq = expr_make_seq();
   seq = expr_seq_add_element(seq, x0);
   seq = expr_seq_add_element(seq, x1);
   seq = expr_seq_add_element(seq, x2);
@@ -141,7 +141,7 @@ expr_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2)
 Expr_t *
 expr_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3)
 {
-  Expr_t *seq = vrtc_make_seq();
+  Expr_t *seq = expr_make_seq();
   seq = expr_seq_add_element(seq, x0);
   seq = expr_seq_add_element(seq, x1);
   seq = expr_seq_add_element(seq, x2);
