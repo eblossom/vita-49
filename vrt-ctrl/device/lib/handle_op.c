@@ -22,6 +22,7 @@
 #include <config.h>
 #endif
 #include "handle_op.h"
+#include "resolve_resource.h"
 #include <vrtc/device_prims.h>
 
 #define VERBOSE 1
@@ -29,40 +30,26 @@
 void
 handle_get(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path)
 {
-  if (VERBOSE){
-    printf("handle_get: ");
-    expr_print(path);
-    printf("\n");
-  }
-
-  expr_encode_and_free(vrtc_make_reply(inv_id,
-				       expr_make_seq3(expr_make_cstring("abc"),
-						      expr_make_cstring("def"),
-						      expr_make_cstring("ghi"))),
-		       dgbuf);
+  op_info_t	oi;
+  init_op_info(&oi, dgbuf, opGET, inv_id, path);
+  resolve_resource(&oi);
 }
 
 void
 handle_get_meta(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path)
 {
-  if (VERBOSE){
-    printf("handle_get_meta: ");
-    expr_print(path);
-    printf("\n");
-  }
+  op_info_t	oi;
+  init_op_info(&oi, dgbuf, opGET_META, inv_id, path);
+  resolve_resource(&oi);
 }
 
 void
 handle_put(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path,
 	   Expr_t *value, Expr_t *when)
 {
-  if (VERBOSE){
-    printf("handle_put: ");
-    expr_print(path);
-    printf(" ");
-    expr_print(value);
-    printf(" ");
-    expr_print(when);
-    printf("\n");
-  }
+  op_info_t	oi;
+  init_op_info(&oi, dgbuf, opPUT, inv_id, path);
+  oi.value = value;
+  oi.when = when;
+  resolve_resource(&oi);
 }

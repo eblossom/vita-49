@@ -26,7 +26,7 @@
 Expr_t *
 error_not_implemented(vrtd_node_t *self, vrtd_traversal_info_t *ti)
 {
-  return vrtc_make_error_info2(vrtc_EC_NOT_IMPLEMENTED, ti->path);
+  return vrtc_make_error_info2(vrtc_EC_NOT_IMPLEMENTED, expr_clone(ti->path));
 }
 
 // Get-ers

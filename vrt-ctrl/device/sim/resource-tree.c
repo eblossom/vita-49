@@ -61,7 +61,7 @@ extern vrtd_node_t temp_node;
 
 
 vrtd_node_t root_node = {
-  .path_term = "/",
+  .path_term = "",
   .u.dir.first_child = &freq_node
 };
 

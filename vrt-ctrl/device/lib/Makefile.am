@@ -25,8 +25,12 @@ lib_LTLIBRARIES = libvrtc-device.la
 
 libvrtc_device_la_SOURCES = \
 	handle_op.c \
+	resolve_resource.c \
 	vrtcd_handle_incoming_datagram.c
 
 libvrtc_device_la_LIBADD = \
 	../../common/lib/libvrtc-common.la
 
+noinst_INCLUDES = \
+	handle_op.h \
+	resolve_resource.h
