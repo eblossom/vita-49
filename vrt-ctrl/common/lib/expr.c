@@ -88,6 +88,23 @@ vrtc_seq_add(Expr_t *seq, Expr_t *element)
 }
 
 Expr_t *
+expr_seq_add_element(Expr_t *seq, Expr_t *element)
+{
+  if (element == 0){
+    expr_free(seq);
+    return 0;
+  }
+
+  if (!vrtc_seq_add(seq, element)){
+    expr_free(seq);
+    expr_free(element);
+    return 0;
+  }
+
+  return seq;
+}
+
+Expr_t *
 expr_make_seq0(void)
 {
   return vrtc_make_seq();

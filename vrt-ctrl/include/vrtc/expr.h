@@ -81,6 +81,19 @@ Expr_t *expr_make_seq3(Expr_t *x0, Expr_t *x1, Expr_t *x2);
  */
 Expr_t *expr_make_seq4(Expr_t *x0, Expr_t *x1, Expr_t *x2, Expr_t *x3);
 
+/*!
+ * \brief Returns a zero length sequence to which elements can be added
+ * using vrtc_seq_add_element.
+ */
+Expr_t *vrtc_make_seq(void);
+
+/*!
+ * \brief Add element to seq.
+ *
+ * \Returns seq if successful, else frees element and seq and returns 0.
+ */
+Expr_t *vrtc_seq_add_element(Expr_t *seq, Expr_t *element);
+
   /* ----- Predicates ----- */
 
   static inline bool expr_is_seq(Expr_t *x) { return x->present == Expr_PR_seq; }
