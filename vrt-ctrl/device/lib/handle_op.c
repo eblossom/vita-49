@@ -27,7 +27,7 @@
 #define VERBOSE 1
 
 void
-handle_get(int inv_id, Expr_t *path, datagram_buffer_t *dgbuf)
+handle_get(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path)
 {
   if (VERBOSE){
     printf("handle_get: ");
@@ -43,7 +43,7 @@ handle_get(int inv_id, Expr_t *path, datagram_buffer_t *dgbuf)
 }
 
 void
-handle_get_meta(int inv_id, Expr_t *path, datagram_buffer_t *dgbuf)
+handle_get_meta(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path)
 {
   if (VERBOSE){
     printf("handle_get_meta: ");
@@ -53,7 +53,7 @@ handle_get_meta(int inv_id, Expr_t *path, datagram_buffer_t *dgbuf)
 }
 
 void
-handle_put(int inv_id, Expr_t *path, Expr_t *value, datagram_buffer_t *dgbuf)
+handle_put(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path, Expr_t *value)
 {
   if (VERBOSE){
     printf("handle_put: ");

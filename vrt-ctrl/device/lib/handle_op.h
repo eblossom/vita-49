@@ -25,12 +25,12 @@
 #include <vrtc/datagram_buffer.h>
 
 /* path is known to be a string */
-void handle_get(int inv_id, Expr_t *path, datagram_buffer_t *dgbuf);
+void handle_get(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path);
 
 /* path is known to be a string */
-void handle_get_meta(int inv_id, Expr_t *path, datagram_buffer_t *dgbuf);
+void handle_get_meta(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path);
 
 /* path is known to be a string */
-void handle_put(int inv_id, Expr_t *path, Expr_t *value, datagram_buffer_t *dgbuf);
+void handle_put(datagram_buffer_t *dgbuf, int inv_id, Expr_t *path, Expr_t *value);
 
 #endif /* INCLUDED_HANDLE_OP_H */

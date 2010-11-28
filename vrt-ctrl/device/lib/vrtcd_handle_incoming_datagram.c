@@ -118,11 +118,11 @@ vrtcd_handle_expr(Expr_t *e, datagram_buffer_t *dgbuf)
   }
   
   if (op_is_get(opcode_and_args, &path))
-    handle_get(inv_id, path, dgbuf);
+    handle_get(dgbuf, inv_id, path);
   else if (op_is_get_meta(opcode_and_args, &path))
-    handle_get_meta(inv_id, path, dgbuf);
+    handle_get_meta(dgbuf, inv_id, path);
   else if (op_is_put(opcode_and_args, &path, &value))
-    handle_put(inv_id, path, value, dgbuf);
+    handle_put(dgbuf, inv_id, path, value);
   else
     goto unrecognized_msg;
 }
