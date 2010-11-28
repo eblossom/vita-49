@@ -20,6 +20,8 @@
 
 #include "resolve_resource.h"
 #include <vrtc/device/vrtd_node.h>
+#include <vrtc/protocol-consts.h>
+#include <vrtc/device_prims.h>
 #include <string.h>
 
 
@@ -32,9 +34,63 @@ static char path_buf[MAX_PATH_LEN + 1];
 
 
 static void
+send_error(op_info_t *oi, int error_code, Expr_t *error_arg)
+{
+  expr_encode_and_free(vrtc_make_error(oi->inv_id, error_code, error_arg),
+		       oi->dgbuf);
+}
+
+static void
+send_reply(op_info_t *oi, Expr_t *reply)
+{
+  expr_encode_and_free(vrtc_make_reply(oi->inv_id, reply), oi->dgbuf);
+}
+
+static Expr_t *
+leaf_seq(Expr_t *e)
+{
+  return expr_make_seq2(expr_make_int(vrtc_LEAF), e);
+}
+
+static Expr_t *
+dir_seq(Expr_t *e)
+{
+  return expr_make_seq2(expr_make_int(vrtc_DIR), e);
+}
+
+static Expr_t *
+get_children_path_terms(vrtd_node_t *node)
+{
+  vrtd_node_t	*p = node->u.dir.first_child;
+  return expr_make_seq0();	// FIXME
+}
+
+
+static void
 apply_op(op_info_t *oi, vrtd_traversal_info_t *ti, vrtd_node_t *node)
 {
-  // FIXME
+  if (is_dir(node)){
+    switch(oi->op_code){
+    case opGET:
+    case opGET_META:
+      send_reply(oi, dir_seq(get_children_path_terms(node)));
+      return;
+
+    case opPUT:
+      send_error(oi, vrtc_EC_NOT_PUTTABLE, expr_clone(oi->path));
+      return;
+    }
+  }
+  else {	// is_leaf
+    switch(oi->op_code){
+    case opGET:
+    case opGET_META:
+    case opPUT:
+      send_error(oi, vrtc_EC_NOT_IMPLEMENTED, expr_clone(oi->path));
+      return;
+    }
+  }
+  send_error(oi, vrtc_EC_INTERNAL_ERROR, expr_clone(oi->path));
 }
 
 static void
@@ -48,7 +104,7 @@ static bool
 split(char *p, unsigned int plen,
       unsigned int *vlen_, char **vpath)
 {
-  p[plen] = 0;	// null terminate the final <path-term> now
+  p[plen] = 0;	// null terminate path.
 
   int vlen;
   char *slash = 0;
@@ -86,10 +142,12 @@ resolve_resource(op_info_t *oi)
   unsigned char *p = expr_string_ptr(oi->path);
 
   if (slen > MAX_PATH_LEN){
-    // error PATH_TOO_LONG
+    send_error(oi, vrtc_EC_PATH_TOO_LONG, expr_clone(oi->path));
+    return;
   }
   if (slen < 1 || *p != '/'){
-    // error INVALID_PATH
+    send_error(oi, vrtc_EC_INVALID_PATH, expr_clone(oi->path));
+    return;
   }
 
   if (slen == 1){		// apply operator to root node
@@ -103,7 +161,7 @@ resolve_resource(op_info_t *oi)
     memcpy(path_buf, p, slen);
 
     if (!split(path_buf, slen, &ti.vlen, ti.vpath)){
-      // error PATH_TOO_DEEP
+      send_error(oi, vrtc_EC_PATH_TOO_DEEP, expr_clone(oi->path));
     }
 
     search_node(oi, &ti, &root_node);
