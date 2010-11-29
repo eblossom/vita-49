@@ -45,6 +45,7 @@
 #define vrtc_EC_NOT_PUTTABLE		8
 #define vrtc_EC_NOT_GETTABLE		9
 #define vrtc_EC_INTERNAL_ERROR	       10
+#define vrtc_EC_PATH_TOO_NUMERIC       11
 
 
 /* note-kind constants */

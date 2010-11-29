@@ -23,6 +23,7 @@
 #include <vrtc/protocol-consts.h>
 #include <vrtc/device_prims.h>
 #include <string.h>
+#include <assert.h>
 
 
 #define MAX_PATH_LEN	512
@@ -97,10 +98,46 @@ apply_op(op_info_t *oi, vrtd_traversal_info_t *ti, vrtd_node_t *node)
   send_error(oi, vrtc_EC_INTERNAL_ERROR, expr_clone(oi->path));
 }
 
+/*
+ * Search the children of parent for the as yet unmatched portion of vpath.
+ * If found, apply_op to the node, otherwise send an error.
+ */
 static void
-search_node(op_info_t *oi, vrtd_traversal_info_t *ti, vrtd_node_t *node)
+search_node(op_info_t *oi, vrtd_traversal_info_t *ti, vrtd_node_t *parent)
 {
-  // FIXME
+ tail_recurse:
+
+  assert(ti->vi < ti->vlen);
+
+  vrtd_node_t *child = parent->u.dir.first_child;
+  for (; child; child = child->sibling){
+    if (strcmp(child->path_term, ti->vpath[ti->vi]) == 0){ // Found match
+
+      // If this is a numeric path term, save the value in the ntp for
+      // easy use by the resource operators.
+      if (is_numeric_path_term(child)){
+	if (ti->nptlen < MAX_NUMERIC_PATH_TERMS){
+	  ti->npt[ti->nptlen++] = child->numeric_path_value;
+	}
+	else {
+	  send_error(oi, vrtc_EC_PATH_TOO_NUMERIC, expr_clone(oi->path));
+	  return;
+	}
+      }
+
+      ti->vi++;
+      if (ti->vi == ti->vlen){	// Matched entire path.  This is our node.
+	apply_op(oi, ti, child);
+	return;
+      }
+      else {			// Matched this piece; go deeper.
+	parent = child;
+	goto tail_recurse;
+      }
+    }
+  }
+  // no match
+  send_error(oi, vrtc_EC_NO_ENTRY, expr_clone(oi->path));
 }
 
 
